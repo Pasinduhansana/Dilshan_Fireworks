@@ -28,6 +28,17 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+.hero-image {
+  transform: scale(1.1);
+  will-change: transform;
+}
+
+.intro-element {
+  opacity: 0;
+  filter: blur(18px);
+  transform: translateY(28px);
+}
+
 .legible {
   text-shadow: var(--tshadow);
 }

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import CinematicIntro from "@/components/CinematicIntro";
 
 const navLinks = [
   { label: "Home", href: "#home" },
@@ -30,7 +31,7 @@ const socials = [
 
 export default function Home() {
   return (
-    <main className="relative h-[100dvh] min-h-[560px] w-full overflow-hidden bg-[#f7f8f4] p-[7px] sm:p-[10px]">
+    <CinematicIntro className="relative h-[100dvh] min-h-[560px] w-full overflow-hidden bg-[#f7f8f4] p-[7px] sm:p-[10px]">
       <section className="relative isolate h-full w-full overflow-hidden rounded-[9px] sm:rounded-[12px]">
         <Image
           src="/images/hero.jpg"
@@ -38,13 +39,13 @@ export default function Home() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[58%_42%]"
+          className="hero-image object-cover object-[58%_42%]"
         />
         <div className="hero-scrim pointer-events-none absolute inset-0" />
 
         <nav
           aria-label="Primary"
-          className="absolute right-[2%] top-[4%] z-20 flex items-center gap-0.5 rounded-full border border-white/70 bg-[#f7f8f4]/95 p-[5px] shadow-[0_10px_32px_rgba(6,28,34,0.3)] backdrop-blur-sm sm:gap-1 sm:p-[7px]"
+          className="intro-element absolute right-[2%] top-[4%] z-20 flex items-center gap-0.5 rounded-full border border-white/70 bg-[#f7f8f4]/95 p-[5px] shadow-[0_10px_32px_rgba(6,28,34,0.3)] backdrop-blur-sm sm:gap-1 sm:p-[7px]"
         >
           {navLinks.map((link, index) => (
             <a
@@ -62,7 +63,7 @@ export default function Home() {
         </nav>
 
         {/* Bottom left Content */}
-        <div className="absolute bottom-[10%] left-[4%] z-10 w-[88%] sm:bottom-[8%] sm:w-[56%]">
+        <div className="intro-element absolute bottom-[10%] left-[4%] z-10 w-[88%] sm:bottom-[8%] sm:w-[56%]">
           <div className="legible">
             <h1 className="font-head text-[clamp(1.9rem,6vw,2.7rem)] font-semibold leading-[1.04] tracking-[-0.025em] text-white sm:text-[clamp(2rem,4.6vw,4rem)]">
               Light Up Every
@@ -78,7 +79,7 @@ export default function Home() {
 
           <div className="mt-6 flex flex-wrap items-center gap-2.5 sm:mt-8">
             <a
-              href="#collection"
+              href="#packages"
               className="rounded-full bg-gradient-to-b from-[#ebac6b] to-[#d5843f] px-5 py-[10px] text-[10px] font-semibold text-white shadow-[0_6px_18px_rgba(190,105,45,0.35)] transition-transform hover:-translate-y-0.5 sm:text-[11px]"
             >
               Explore Fireworks
@@ -93,7 +94,7 @@ export default function Home() {
         </div>
 
         {/* Top right card */}
-        <aside className="absolute right-[4%] top-[18%] z-20 hidden w-[184px] rounded-[14px] bg-[#f8faf7] p-3 shadow-[0_10px_30px_rgba(6,28,34,0.25)] sm:block lg:w-[210px]">
+        <aside className="intro-element absolute right-[4%] top-[18%] z-20 hidden w-[184px] rounded-[14px] bg-[#f8faf7] p-3 shadow-[0_10px_30px_rgba(6,28,34,0.25)] sm:block lg:w-[210px]">
           <div className="overflow-hidden rounded-[8px]">
             <Image
               src="/images/hero.jpg"
@@ -114,7 +115,7 @@ export default function Home() {
         </aside>
 
         {/* Bottom rignt corner */}
-        <aside className="absolute right-[4%] top-[42%] z-20 w-[176px] rounded-[14px] border border-white/25 bg-white/15 p-5 backdrop-blur-md sm:bottom-[16%] sm:top-auto sm:w-[224px] sm:p-6">
+        <aside className="intro-element absolute right-[4%] top-[42%] z-20 w-[176px] rounded-[14px] border border-white/25 bg-white/15 p-5 backdrop-blur-md sm:bottom-[16%] sm:top-auto sm:w-[224px] sm:p-6">
           <p className="text-[30px] font-semibold leading-none tracking-tight text-white legible lg:text-[40px]">100+</p>
           <p className="mt-3 text-[10px] leading-[1.55] text-white/90 legible lg:text-[12px]">
             Celebrations lit up across Sri Lanka with safe, spectacular fireworks. Every show is planned around the moment you want to remember.
@@ -127,7 +128,7 @@ export default function Home() {
           </a>
         </aside>
 
-        <div className="absolute bottom-[5%] right-[4%] z-20 flex gap-2">
+        <div className="intro-element absolute bottom-[5%] right-[4%] z-20 flex gap-2">
           {socials.map((social) => (
             <a
               key={social.label}
@@ -142,6 +143,6 @@ export default function Home() {
           ))}
         </div>
       </section>
-    </main>
+    </CinematicIntro>
   );
 }
