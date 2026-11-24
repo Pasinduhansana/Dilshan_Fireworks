@@ -15,9 +15,9 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Cosmic Path — Astrology Readings & Personalized Horoscopes",
+  title: "Dilshan Fireworks — Celebration Fireworks in Sri Lanka",
   description:
-    "In-depth astrology readings, birth charts and personal horoscopes that guide you toward clarity.",
+    "Safe, hand-picked fireworks and dazzling displays for celebrations across Sri Lanka. Make every night one to remember.",
 };
 
 export const viewport = {

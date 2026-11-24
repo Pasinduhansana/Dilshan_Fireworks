@@ -1,5 +1,14 @@
 import Image from "next/image";
 
+const navLinks = [
+  { label: "Home", href: "#home" },
+  { label: "Events", href: "#events" },
+  { label: "Packages", href: "#packages" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "Gallery", href: "#gallery" },
+  { label: "Contact Us", href: "#contact" },
+];
+
 const socials = [
   {
     label: "Facebook",
@@ -35,61 +44,50 @@ export default function Home() {
 
         <nav
           aria-label="Primary"
-          className="absolute right-[2%] top-[4%] z-20 flex items-center gap-1 rounded-full border border-white/70 bg-[#f7f8f4]/95 p-[6px] shadow-[0_10px_32px_rgba(6,28,34,0.3)] backdrop-blur-sm sm:gap-2 sm:p-[8px]"
+          className="absolute right-[2%] top-[4%] z-20 flex items-center gap-0.5 rounded-full border border-white/70 bg-[#f7f8f4]/95 p-[5px] shadow-[0_10px_32px_rgba(6,28,34,0.3)] backdrop-blur-sm sm:gap-1 sm:p-[7px]"
         >
-          <a
-            href="#home"
-            className="rounded-full bg-gradient-to-b from-[#ebac6b] to-[#d5843f] px-3.5 py-[8px] text-[10px] font-semibold text-white shadow-[0_4px_12px_rgba(190,105,45,0.35)] sm:px-6 sm:py-2.5 sm:text-[12px]"
-          >
-            Home
-          </a>
-          <a
-            href="#about"
-            className="rounded-full px-3 py-[8px] text-[10px] font-medium text-[#35515a] transition-colors hover:bg-[#35515a]/5 sm:px-5 sm:py-2.5 sm:text-[12px]"
-          >
-            About
-          </a>
-          <a
-            href="#services"
-            className="rounded-full px-3 py-[8px] text-[10px] font-medium text-[#35515a] transition-colors hover:bg-[#35515a]/5 sm:px-5 sm:py-2.5 sm:text-[12px]"
-          >
-            Services
-          </a>
-          <a
-            href="#work"
-            className="rounded-full px-3 py-[8px] text-[10px] font-medium text-[#35515a] transition-colors hover:bg-[#35515a]/5 sm:px-5 sm:py-2.5 sm:text-[12px]"
-          >
-            Work
-          </a>
+          {navLinks.map((link, index) => (
+            <a
+              key={link.label}
+              href={link.href}
+              className={
+                index === 0
+                  ? "whitespace-nowrap rounded-full bg-gradient-to-b from-[#ebac6b] to-[#d5843f] px-2.5 py-[7px] text-[9px] font-semibold text-white shadow-[0_4px_12px_rgba(190,105,45,0.35)] sm:px-5 sm:py-2.5 sm:text-[12px]"
+                  : "whitespace-nowrap rounded-full px-2 py-[7px] text-[9px] font-medium text-[#35515a] transition-colors hover:bg-[#35515a]/5 sm:px-4 sm:py-2.5 sm:text-[12px]"
+              }
+            >
+              {link.label}
+            </a>
+          ))}
         </nav>
 
         {/* Bottom left Content */}
         <div className="absolute bottom-[10%] left-[4%] z-10 w-[88%] sm:bottom-[8%] sm:w-[56%]">
           <div className="legible">
             <h1 className="font-head text-[clamp(1.9rem,6vw,2.7rem)] font-semibold leading-[1.04] tracking-[-0.025em] text-white sm:text-[clamp(2rem,4.6vw,4rem)]">
-              Your Cosmic Path
+              Light Up Every
               <br />
-              To Clarity.
+              Celebration.
             </h1>
             <div className="mt-4 hidden h-px w-[76%] bg-gradient-to-r from-white/45 via-white/20 to-transparent sm:block" />
-            <p className="mt-4 max-w-[330px] text-[10px] leading-[1.7] text-white/85 sm:mt-5 sm:text-[11px]">
-              Through in-depth astrology readings, birth charts and personal horoscopes, we guide you discovering the cosmos for illuminating your
-              life.
+            <p className="mt-4 max-w-[330px] text-[12px] leading-[1.7] text-white/85 sm:mt-5 sm:text-[14px]">
+              From family gatherings to grand festivals across Sri Lanka, Dilshan Fireworks creates dazzling displays with safe, hand-picked
+              fireworks. We turn every celebration into a night people remember.
             </p>
           </div>
 
           <div className="mt-6 flex flex-wrap items-center gap-2.5 sm:mt-8">
             <a
-              href="#get-started"
+              href="#collection"
               className="rounded-full bg-gradient-to-b from-[#ebac6b] to-[#d5843f] px-5 py-[10px] text-[10px] font-semibold text-white shadow-[0_6px_18px_rgba(190,105,45,0.35)] transition-transform hover:-translate-y-0.5 sm:text-[11px]"
             >
-              Get Started
+              Explore Fireworks
             </a>
             <a
-              href="#learn-more"
+              href="#contact"
               className="rounded-full border border-white/30 bg-white/20 px-5 py-[10px] text-[10px] font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/30 sm:text-[11px]"
             >
-              Learn More
+              Get a Quote
             </a>
           </div>
         </div>
@@ -110,20 +108,19 @@ export default function Home() {
               <path d="M7 17 17 7M9 7h8v8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </span>
-          <p className="mt-3 px-0.5 text-[9px] leading-[1.5] text-[#33484f] lg:text-[10px]">
-            Whether you&apos;re seeking answers about love, career, or purpose, we&apos;re here to assist. Each insight tailored with your
-            astrological
+          <p className="mt-3 px-0.5 text-[10px] leading-[1.5] text-[#33484f] lg:text-[12px]">
+            From intimate family gatherings to grand village festivals, every display is tailored to your moment with safe, brilliant fireworks.
           </p>
         </aside>
 
         {/* Bottom rignt corner */}
         <aside className="absolute right-[4%] top-[42%] z-20 w-[176px] rounded-[14px] border border-white/25 bg-white/15 p-5 backdrop-blur-md sm:bottom-[16%] sm:top-auto sm:w-[224px] sm:p-6">
-          <p className="text-[30px] font-semibold leading-none tracking-tight text-white legible lg:text-[40px]">1000+</p>
+          <p className="text-[30px] font-semibold leading-none tracking-tight text-white legible lg:text-[40px]">100+</p>
           <p className="mt-3 text-[10px] leading-[1.55] text-white/90 legible lg:text-[12px]">
-            Personalized Horoscopes crafted just for you. Each reading is uniquely aligned with your astrological
+            Celebrations lit up across Sri Lanka with safe, spectacular fireworks. Every show is planned around the moment you want to remember.
           </p>
-          <a href="#get-started" className="mt-4 inline-flex items-center gap-1.5 text-[10px] font-semibold text-white legible lg:text-[12px]">
-            Get Started
+          <a href="#contact" className="mt-4 inline-flex items-center gap-1.5 text-[10px] font-semibold text-white legible lg:text-[12px]">
+            Get a Quote
             <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5 fill-none stroke-current stroke-2">
               <path d="M4 12h15m-6-6 6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
