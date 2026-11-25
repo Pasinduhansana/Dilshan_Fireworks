@@ -51,7 +51,79 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
       navbar.style.zIndex = "9999";
     };
     pinNavbar();
-    window.addEventListener("resize", pinNavbar);
+
+    const navLinks = navbar ? Array.from(navbar.querySelectorAll<HTMLElement>("a")) : [];
+    let indicator: HTMLElement | null = null;
+    let activeLink: HTMLElement | null = null;
+    let homeLink: HTMLElement | null = null;
+    let eventsLink: HTMLElement | null = null;
+
+    const placeIndicator = (link: HTMLElement | null, animate: boolean) => {
+      if (!indicator || !link) return;
+      const vars = { x: link.offsetLeft, y: link.offsetTop, width: link.offsetWidth, height: link.offsetHeight };
+      if (animate && !reduced) {
+        gsap.to(indicator, { ...vars, duration: 0.55, ease: "power3.inOut", overwrite: true });
+      } else {
+        gsap.set(indicator, vars);
+      }
+    };
+
+    const selectLink = (link: HTMLElement | null, animate: boolean) => {
+      const animated = animate && !reduced;
+      if (activeLink && activeLink !== link) {
+        if (animated) gsap.to(activeLink, { color: "#35515a", duration: 0.55, ease: "power3.inOut", overwrite: "auto" });
+        else gsap.set(activeLink, { color: "#35515a" });
+      }
+      activeLink = link;
+      if (link) {
+        if (animated) gsap.to(link, { color: "#ffffff", duration: 0.55, ease: "power3.inOut", overwrite: "auto" });
+        else gsap.set(link, { color: "#ffffff" });
+      }
+      placeIndicator(link, animate);
+    };
+
+    if (navbar && navLinks.length) {
+      indicator = document.createElement("span");
+      indicator.setAttribute("aria-hidden", "true");
+      Object.assign(indicator.style, {
+        position: "absolute",
+        left: "0",
+        top: "0",
+        zIndex: "0",
+        pointerEvents: "none",
+        borderRadius: "9999px",
+        background: "linear-gradient(to bottom, #ebac6b, #d5843f)",
+        boxShadow: "0 4px 12px rgba(190,105,45,0.35)",
+      });
+      navbar.insertBefore(indicator, navbar.firstChild);
+      navLinks.forEach((link) => {
+        link.style.position = "relative";
+        link.style.zIndex = "1";
+        link.style.transitionProperty = "background-color";
+      });
+      homeLink = navLinks[0];
+      eventsLink = navLinks.find((link) => link.getAttribute("href") === "#events") ?? null;
+      homeLink.style.background = "transparent";
+      homeLink.style.boxShadow = "none";
+      selectLink(homeLink, false);
+      document.fonts?.ready.then(() => placeIndicator(activeLink, false));
+    }
+
+    let scrollActive = homeLink;
+    const syncScrollActive = () => {
+      const next = eventShell.getBoundingClientRect().top <= window.innerHeight * 0.5 ? eventsLink : homeLink;
+      if (next && next !== scrollActive) {
+        scrollActive = next;
+        selectLink(next, true);
+      }
+    };
+    window.addEventListener("scroll", syncScrollActive, { passive: true });
+
+    const handleResize = () => {
+      pinNavbar();
+      placeIndicator(activeLink, false);
+    };
+    window.addEventListener("resize", handleResize);
 
     let transition: gsap.core.Timeline | null = null;
 
@@ -63,6 +135,11 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
     const handleNavClick = (event: MouseEvent) => {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const target = event.target;
+      const clickedLink = target instanceof Element ? target.closest("nav a") : null;
+      if (clickedLink && navLinks.includes(clickedLink as HTMLElement)) {
+        selectLink(clickedLink as HTMLElement, true);
+      }
+
       const anchor = target instanceof Element ? target.closest('a[href="#events"], a[href="#home"]') : null;
       if (!anchor) return;
 
@@ -80,7 +157,7 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
       const position = { y: window.scrollY };
       scrollTween.current = gsap.to(position, {
         y: destination,
-        duration: 1.65,
+        duration: 0.95,
         ease: "power2.inOut",
         overwrite: true,
         onUpdate: () => window.scrollTo(0, position.y),
@@ -144,10 +221,12 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
 
     return () => {
       document.removeEventListener("click", handleNavClick);
+      window.removeEventListener("scroll", syncScrollActive);
       window.removeEventListener("wheel", handleInterrupt);
       window.removeEventListener("touchstart", handleInterrupt);
       window.removeEventListener("keydown", handleInterrupt);
-      window.removeEventListener("resize", pinNavbar);
+      window.removeEventListener("resize", handleResize);
+      indicator?.remove();
       if (navbar && navParent) navParent.insertBefore(navbar, navNextSibling);
       stopScrollTween();
       context?.revert();
