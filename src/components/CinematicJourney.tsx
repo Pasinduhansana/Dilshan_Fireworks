@@ -28,6 +28,27 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
       (element) => element.tagName !== "NAV",
     );
 
+    landingShell.style.isolation = "auto";
+    const innerSection = landingShell.querySelector<HTMLElement>("section");
+    if (innerSection) innerSection.style.isolation = "auto";
+
+    const navbar = landingShell.querySelector<HTMLElement>("nav");
+    const pinNavbar = () => {
+      if (!navbar || !innerSection) return;
+      let documentTop = 0;
+      let node: HTMLElement | null = innerSection;
+      while (node) {
+        documentTop += node.offsetTop;
+        node = node.offsetParent as HTMLElement | null;
+      }
+      navbar.style.position = "fixed";
+      navbar.style.top = `${documentTop + innerSection.offsetHeight * 0.04}px`;
+      navbar.style.right = `${window.innerWidth - innerSection.getBoundingClientRect().right + innerSection.offsetWidth * 0.02}px`;
+      navbar.style.zIndex = "100";
+    };
+    pinNavbar();
+    window.addEventListener("resize", pinNavbar);
+
     let transition: gsap.core.Timeline | null = null;
 
     const stopScrollTween = () => {
@@ -85,6 +106,8 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
             pinSpacing: false,
             scrub: 1,
             invalidateOnRefresh: true,
+            onLeave: () => gsap.set(landingShell, { clearProps: "transform" }),
+            onEnterBack: () => gsap.set(landingShell, { clearProps: "transform" }),
           },
         });
 
@@ -112,6 +135,7 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
       window.removeEventListener("wheel", handleInterrupt);
       window.removeEventListener("touchstart", handleInterrupt);
       window.removeEventListener("keydown", handleInterrupt);
+      window.removeEventListener("resize", pinNavbar);
       stopScrollTween();
       context?.revert();
     };
@@ -119,10 +143,10 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
 
   return (
     <div ref={root} className="relative w-full">
-      <div id="home" data-landing-shell className="relative isolate">
+      <div id="home" data-landing-shell className="relative">
         {landing}
       </div>
-      <div data-event-shell className="relative z-10">{events}</div>
+      <div data-event-shell className="relative z-30">{events}</div>
     </div>
   );
 }

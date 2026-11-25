@@ -45,26 +45,22 @@ export default function Event() {
 
     const context = gsap.context(() => {
       section.querySelectorAll<HTMLElement>(".event-chapter").forEach((chapter) => {
-        const pieces = chapter.querySelectorAll(".event-chapter__reveal");
+        const pieces = chapter.querySelectorAll<HTMLElement>(".event-chapter__reveal");
         if (!pieces.length) return;
 
-        gsap.fromTo(
-          pieces,
-          { opacity: 0, filter: "blur(16px)" },
-          {
-            opacity: 1,
-            filter: "blur(0px)",
-            duration: 1.15,
-            ease: "power2.out",
-            stagger: 0.12,
-            immediateRender: true,
-            scrollTrigger: {
-              trigger: chapter,
-              start: chapter.tagName === "HEADER" ? "top 5%" : "top 82%",
-              once: true,
-            },
+        gsap.set(pieces, { opacity: 0, filter: "blur(16px)" });
+        gsap.to(pieces, {
+          opacity: 1,
+          filter: "blur(0px)",
+          duration: 1.15,
+          ease: "power2.out",
+          stagger: 0.12,
+          scrollTrigger: {
+            trigger: chapter,
+            start: chapter.tagName === "HEADER" ? "top 15%" : "top 82%",
+            once: true,
           },
-        );
+        });
       });
     }, section);
 
@@ -72,18 +68,10 @@ export default function Event() {
   }, []);
 
   return (
-    <section
-      id="events"
-      ref={root}
-      aria-labelledby="events-title"
-      className="relative isolate overflow-hidden bg-[#071a20] text-white"
-      style={{
-        backgroundImage:
-          "radial-gradient(1100px 620px at 78% 4%, rgba(77,156,153,0.16), transparent 70%), radial-gradient(900px 700px at 4% 42%, rgba(223,145,76,0.1), transparent 70%), linear-gradient(180deg, #163b42 0%, #071a20 22%, #071a20 100%)",
-      }}
-    >
-      <div className="relative mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16">
-        <header className="event-chapter relative flex min-h-[72vh] flex-col justify-center pb-14 pt-24 sm:pb-20 sm:pt-28 lg:min-h-[88vh]">
+    <section id="events" ref={root} aria-labelledby="events-title" className="relative text-white">
+      <div className="relative mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-8 sm:py-8 lg:px-12">
+        <div className="rounded-[20px] border border-white/15 bg-[rgba(7,26,32,0.28)] px-6 py-12 shadow-[0_30px_90px_rgba(0,0,0,0.35)] backdrop-blur-[22px] sm:px-10 sm:py-16 lg:px-16">
+          <header className="event-chapter relative flex min-h-[72vh] flex-col justify-center pb-14 pt-24 sm:pb-20 sm:pt-28 lg:min-h-[88vh]">
           <div
             aria-hidden="true"
             className="event-chapter__reveal pointer-events-none absolute right-0 top-[20vh] hidden h-[60vh] w-[34vw] max-w-[480px] overflow-hidden rounded-[12px] opacity-60 lg:block"
@@ -148,17 +136,17 @@ export default function Event() {
           ))}
         </div>
 
-        <section className="event-chapter mt-12 rounded-[14px] bg-[#f7f8f4] px-6 py-14 text-[#163b42] sm:mt-16 sm:px-12 sm:py-20">
+        <section className="event-chapter mt-12 rounded-[14px] border border-white/10 bg-white/[0.06] px-6 py-14 sm:mt-16 sm:px-12 sm:py-20">
           <div className="event-chapter__reveal flex flex-col gap-12 lg:flex-row lg:items-end lg:justify-between lg:gap-20">
             <div>
-              <span className="text-[10px] font-medium uppercase tracking-[0.26em] text-[#9a6234]">What we do</span>
+              <span className="text-[10px] font-medium uppercase tracking-[0.26em] text-[#e0a367]">What we do</span>
               <h3 className="mt-5 max-w-[19ch] font-head text-[clamp(2rem,4.6vw,3.6rem)] font-semibold leading-[1.05] tracking-[-0.035em]">
                 A display built around your moment.
               </h3>
             </div>
-            <ul className="grid gap-5 text-[13px] leading-relaxed text-[#35515a] sm:grid-cols-3 lg:max-w-[44rem]">
+            <ul className="grid gap-5 text-[13px] leading-relaxed text-white/70 sm:grid-cols-3 lg:max-w-[44rem]">
               {promises.map((promise) => (
-                <li key={promise} className="border-t border-[#163b42]/20 pt-4">
+                <li key={promise} className="border-t border-white/20 pt-4">
                   {promise}
                 </li>
               ))}
@@ -179,7 +167,8 @@ export default function Event() {
               <path d="M12 20V5m-6 6 6-6 6 6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </a>
-        </footer>
+          </footer>
+        </div>
       </div>
     </section>
   );
