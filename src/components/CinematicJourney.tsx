@@ -44,7 +44,7 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
       navbar.style.position = "fixed";
       navbar.style.top = `${documentTop + innerSection.offsetHeight * 0.04}px`;
       navbar.style.right = `${window.innerWidth - innerSection.getBoundingClientRect().right + innerSection.offsetWidth * 0.02}px`;
-      navbar.style.zIndex = "100";
+      navbar.style.zIndex = "9999";
     };
     pinNavbar();
     window.addEventListener("resize", pinNavbar);
@@ -96,18 +96,25 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
 
     if (!reduced && foreground.length) {
       context = gsap.context(() => {
+        ScrollTrigger.create({
+          trigger: landingShell,
+          start: "top top",
+          end: "max",
+          pin: true,
+          pinSpacing: false,
+          invalidateOnRefresh: true,
+          onLeave: () => gsap.set(landingShell, { clearProps: "transform" }),
+          onEnterBack: () => gsap.set(landingShell, { clearProps: "transform" }),
+        });
+
         transition = gsap.timeline({
           defaults: { ease: "none" },
           scrollTrigger: {
-            trigger: landingShell,
+            trigger: journey,
             start: "top top",
             end: "+=100%",
-            pin: true,
-            pinSpacing: false,
             scrub: 1,
             invalidateOnRefresh: true,
-            onLeave: () => gsap.set(landingShell, { clearProps: "transform" }),
-            onEnterBack: () => gsap.set(landingShell, { clearProps: "transform" }),
           },
         });
 
@@ -147,6 +154,10 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
         {landing}
       </div>
       <div data-event-shell className="relative z-30">{events}</div>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-50 rounded-[9px] border-[7px] border-[#f7f8f4] sm:rounded-[12px] sm:border-[10px]"
+      />
     </div>
   );
 }

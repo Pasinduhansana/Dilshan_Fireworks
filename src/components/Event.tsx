@@ -48,13 +48,13 @@ export default function Event() {
         const pieces = chapter.querySelectorAll<HTMLElement>(".event-chapter__reveal");
         if (!pieces.length) return;
 
-        gsap.set(pieces, { opacity: 0, filter: "blur(16px)" });
+        gsap.set(pieces, { opacity: 0, filter: "blur(24px)" });
         gsap.to(pieces, {
           opacity: 1,
           filter: "blur(0px)",
-          duration: 1.15,
+          duration: 1.4,
           ease: "power2.out",
-          stagger: 0.12,
+          stagger: 0.15,
           scrollTrigger: {
             trigger: chapter,
             start: chapter.tagName === "HEADER" ? "top 15%" : "top 82%",
@@ -69,8 +69,9 @@ export default function Event() {
 
   return (
     <section id="events" ref={root} aria-labelledby="events-title" className="relative text-white">
-      <div className="relative mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-8 sm:py-8 lg:px-12">
-        <div className="rounded-[20px] border border-white/15 bg-[rgba(7,26,32,0.28)] px-6 py-12 shadow-[0_30px_90px_rgba(0,0,0,0.35)] backdrop-blur-[22px] sm:px-10 sm:py-16 lg:px-16">
+      <div className="relative w-full py-5 sm:py-8">
+        <div className="w-full border-y border-white/15 bg-[rgba(7,26,32,0.28)] px-6 py-12 shadow-[0_30px_90px_rgba(0,0,0,0.35)] backdrop-blur-[22px] sm:px-10 sm:py-16 lg:px-16">
+          <div className="mx-auto w-full max-w-[1360px]">
           <header className="event-chapter relative flex min-h-[72vh] flex-col justify-center pb-14 pt-24 sm:pb-20 sm:pt-28 lg:min-h-[88vh]">
           <div
             aria-hidden="true"
@@ -168,6 +169,7 @@ export default function Event() {
             </svg>
           </a>
           </footer>
+          </div>
         </div>
       </div>
     </section>
