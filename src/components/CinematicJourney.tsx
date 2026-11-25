@@ -21,10 +21,14 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
 
     const landingShell = journey.querySelector<HTMLElement>("[data-landing-shell]");
     const eventShell = journey.querySelector<HTMLElement>("[data-event-shell]");
-    const veil = journey.querySelector<HTMLElement>("[data-journey-veil]");
     if (!landingShell || !eventShell) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const foreground = Array.from(landingShell.querySelectorAll<HTMLElement>(".intro-element")).filter(
+      (element) => element.tagName !== "NAV",
+    );
+
+    let transition: gsap.core.Timeline | null = null;
 
     const stopScrollTween = () => {
       scrollTween.current?.kill();
@@ -38,7 +42,7 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
       if (!anchor) return;
 
       event.preventDefault();
-      const destination = landingShell.offsetTop + landingShell.offsetHeight;
+      const destination = transition?.scrollTrigger?.end ?? landingShell.offsetTop + landingShell.offsetHeight;
       history.replaceState(null, "", "#events");
 
       if (reduced) {
@@ -69,39 +73,35 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
 
     let context: ReturnType<typeof gsap.context> | null = null;
 
-    if (!reduced) {
+    if (!reduced && foreground.length) {
       context = gsap.context(() => {
-        const transition = gsap.timeline({
+        transition = gsap.timeline({
           defaults: { ease: "none" },
           scrollTrigger: {
             trigger: landingShell,
             start: "top top",
-            end: "bottom top",
+            end: "+=100%",
+            pin: true,
+            pinSpacing: false,
             scrub: 1,
             invalidateOnRefresh: true,
           },
         });
 
-        transition
-          .to(
-            landingShell,
-            {
-              y: -72,
-              scale: 1.045,
-              filter: "blur(12px)",
-              opacity: 0,
-              transformOrigin: "50% 35%",
-              duration: 1,
-            },
-            0,
-          )
-          .to(veil, { opacity: 0.92, duration: 0.85 }, 0)
-          .fromTo(
-            eventShell,
-            { y: 84, scale: 0.97, filter: "blur(14px)" },
-            { y: 0, scale: 1, filter: "blur(0px)", transformOrigin: "50% 20%", duration: 0.85 },
-            0.15,
-          );
+        transition.fromTo(
+          foreground,
+          { y: 0, opacity: 1, filter: "blur(0px)" },
+          {
+            y: -96,
+            opacity: 0,
+            filter: "blur(14px)",
+            stagger: 0.08,
+            duration: 0.7,
+            overwrite: "auto",
+            immediateRender: false,
+          },
+          0,
+        );
       }, journey);
     }
 
@@ -119,11 +119,10 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
 
   return (
     <div ref={root} className="relative w-full">
-      <div id="home" data-landing-shell className="relative isolate will-change-[transform,filter,opacity]">
+      <div id="home" data-landing-shell className="relative isolate">
         {landing}
-        <div data-journey-veil aria-hidden="true" className="pointer-events-none absolute inset-0 z-30 bg-[#071a20] opacity-0" />
       </div>
-      <div data-event-shell className="relative will-change-[transform,filter,opacity]">{events}</div>
+      <div data-event-shell className="relative z-10">{events}</div>
     </div>
   );
 }

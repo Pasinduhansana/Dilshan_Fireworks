@@ -48,19 +48,23 @@ export default function Event() {
         const pieces = chapter.querySelectorAll(".event-chapter__reveal");
         if (!pieces.length) return;
 
-        gsap.from(pieces, {
-          y: 36,
-          opacity: 0,
-          filter: "blur(8px)",
-          duration: 1.1,
-          ease: "power3.out",
-          stagger: 0.1,
-          scrollTrigger: {
-            trigger: chapter,
-            start: "top 82%",
-            once: true,
+        gsap.fromTo(
+          pieces,
+          { opacity: 0, filter: "blur(16px)" },
+          {
+            opacity: 1,
+            filter: "blur(0px)",
+            duration: 1.15,
+            ease: "power2.out",
+            stagger: 0.12,
+            immediateRender: true,
+            scrollTrigger: {
+              trigger: chapter,
+              start: chapter.tagName === "HEADER" ? "top 5%" : "top 82%",
+              once: true,
+            },
           },
-        });
+        );
       });
     }, section);
 
