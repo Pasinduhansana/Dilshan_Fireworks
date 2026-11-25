@@ -34,7 +34,7 @@ export default function LandingPage() {
     <CinematicIntro className="relative h-[100dvh] min-h-[560px] w-full overflow-hidden bg-[#f7f8f4] p-[7px] sm:p-[10px]">
       <section className="relative isolate h-full w-full overflow-hidden rounded-[9px] sm:rounded-[12px]">
         <Image
-          src="/images/hero.jpg"
+          src="/images/hero.png"
           alt="Woman in a pale astronaut suit with hands beside her gold-lit helmet, surrounded by teal mist"
           fill
           priority
@@ -97,7 +97,7 @@ export default function LandingPage() {
         <aside className="intro-element absolute right-[4%] top-[18%] z-20 hidden w-[184px] rounded-[14px] bg-[#f8faf7] p-3 shadow-[0_10px_30px_rgba(6,28,34,0.25)] sm:block lg:w-[210px]">
           <div className="overflow-hidden rounded-[8px]">
             <Image
-              src="/images/hero.jpg"
+              src="/images/hero.png"
               alt="Astronaut portrait"
               width={200}
               height={112}
@@ -118,7 +118,7 @@ export default function LandingPage() {
         <aside className="intro-element absolute right-[4%] top-[42%] z-20 w-[176px] rounded-[14px] border border-white/25 bg-white/15 p-5 backdrop-blur-md sm:bottom-[16%] sm:top-auto sm:w-[224px] sm:p-6">
           <p className="text-[30px] font-semibold leading-none tracking-tight text-white legible lg:text-[40px]">100+</p>
           <p className="mt-3 text-[10px] leading-[1.55] text-white/90 legible lg:text-[12px]">
-            Celebrations lit up across Sri Lanka with safe, spectacular fireworks. Every show is planned around the moment you want to remember.
+            Celebrations lit up across Sri Lanka with safe, spectacular fireworks.
           </p>
           <a href="#contact" className="mt-4 inline-flex items-center gap-1.5 text-[10px] font-semibold text-white legible lg:text-[12px]">
             Get a Quote

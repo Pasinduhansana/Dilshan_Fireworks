@@ -33,6 +33,10 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
     if (innerSection) innerSection.style.isolation = "auto";
 
     const navbar = landingShell.querySelector<HTMLElement>("nav");
+    const navParent = navbar?.parentElement ?? null;
+    const navNextSibling = navbar?.nextSibling ?? null;
+    if (navbar && navParent) journey.appendChild(navbar);
+
     const pinNavbar = () => {
       if (!navbar || !innerSection) return;
       let documentTop = 0;
@@ -59,12 +63,13 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
     const handleNavClick = (event: MouseEvent) => {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const target = event.target;
-      const anchor = target instanceof Element ? target.closest('a[href="#events"]') : null;
+      const anchor = target instanceof Element ? target.closest('a[href="#events"], a[href="#home"]') : null;
       if (!anchor) return;
 
       event.preventDefault();
-      const destination = transition?.scrollTrigger?.end ?? landingShell.offsetTop + landingShell.offsetHeight;
-      history.replaceState(null, "", "#events");
+      const isHome = anchor.getAttribute("href") === "#home";
+      const destination = isHome ? 0 : (transition?.scrollTrigger?.end ?? landingShell.offsetTop + landingShell.offsetHeight);
+      history.replaceState(null, "", isHome ? "#home" : "#events");
 
       if (reduced) {
         window.scrollTo(0, destination);
@@ -143,6 +148,7 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
       window.removeEventListener("touchstart", handleInterrupt);
       window.removeEventListener("keydown", handleInterrupt);
       window.removeEventListener("resize", pinNavbar);
+      if (navbar && navParent) navParent.insertBefore(navbar, navNextSibling);
       stopScrollTween();
       context?.revert();
     };
