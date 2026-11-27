@@ -7,34 +7,50 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const chapters = [
+const categories = [
   {
-    kicker: "For the people closest to you",
-    title: "Family gatherings",
-    copy: "The small moments deserve the same care as the big ones. Hand-picked fireworks and a display shaped around the people you are celebrating with.",
-    image: "/images/fw-30048038.jpg",
-    alt: "Orange and blue firework blooming against a deep night sky",
-    portrait: true,
+    title: "Weddings",
+    line: "For the moment the sky joins the celebration.",
+    image: "/images/events/wedding.jpg",
+    alt: "Newlyweds beneath sparklers and a shower of fireworks",
+    span: "col-span-2 lg:col-span-7 lg:row-span-2",
   },
   {
-    kicker: "For the whole neighbourhood",
-    title: "Village festivals",
-    copy: "A night that brings everyone out. Brilliant colour, careful planning and fireworks chosen to fit the spirit of the celebration.",
-    image: "/images/fw-32974947.jpg",
-    alt: "Wide golden firework burst radiating across a dark sky",
-    portrait: false,
+    title: "Musical Shows",
+    line: "For the songs you feel more than hear.",
+    image: "/images/events/music.jpg",
+    alt: "Concert crowd beneath red pyrotechnic fireworks and stage lights",
+    span: "lg:col-span-5",
   },
   {
-    kicker: "For the moments that matter most",
-    title: "Grand celebrations",
-    copy: "When the occasion calls for something unforgettable, the display is built around the moment you want everyone to remember.",
-    image: "/images/fw-33689354.jpg",
-    alt: "Blue and gold fireworks filling the night sky",
-    portrait: false,
+    title: "Cricket Matches",
+    line: "For the last ball under the floodlights.",
+    image: "/images/events/cricket.jpg",
+    alt: "Floodlit cricket stadium filled with spectators at night",
+    span: "lg:col-span-5",
+  },
+  {
+    title: "Birthday Parties",
+    line: "For one more wish, and one bigger spark.",
+    image: "/images/events/birthday.jpg",
+    alt: "Friends gathered around a birthday cake with lit candles",
+    span: "lg:col-span-4",
+  },
+  {
+    title: "Corporate Events",
+    line: "For the night after the final keynote.",
+    image: "/images/events/corporate.jpg",
+    alt: "Speaker addressing an audience at a corporate conference",
+    span: "lg:col-span-4",
+  },
+  {
+    title: "Festivals",
+    line: "For a sky that belongs to everyone.",
+    image: "/images/events/festival.jpg",
+    alt: "Crowd watching a brilliant fireworks display at a night festival",
+    span: "lg:col-span-4",
   },
 ];
-
-const promises = ["Hand-picked fireworks", "Displays tailored to the occasion", "Safe, spectacular celebrations"];
 
 export default function Event() {
   const root = useRef<HTMLElement>(null);
@@ -42,6 +58,8 @@ export default function Event() {
   useEffect(() => {
     const section = root.current;
     if (!section || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const cleanups: Array<() => void> = [];
 
     const context = gsap.context(() => {
       section.querySelectorAll<HTMLElement>(".event-chapter").forEach((chapter) => {
@@ -57,14 +75,54 @@ export default function Event() {
           stagger: 0.15,
           scrollTrigger: {
             trigger: chapter,
-            start: chapter.tagName === "HEADER" ? "top 15%" : "top 82%",
+            start: chapter.tagName === "HEADER" ? "top 15%" : "top 85%",
             once: true,
           },
         });
       });
+
+      section.querySelectorAll<HTMLElement>(".event-tile").forEach((tile) => {
+        const media = tile.querySelector<HTMLElement>(".event-tile__media");
+        const image = tile.querySelector<HTMLElement>(".event-tile__media img");
+        const line = tile.querySelector<HTMLElement>(".event-tile__line");
+        const copy = tile.querySelectorAll<HTMLElement>(".event-tile__title, .event-tile__copy");
+        if (!media || !image || !line) return;
+
+        gsap.set(media, { clipPath: "inset(100% 0% 0% 0%)", scale: 1.14, yPercent: -5 });
+        gsap.set([...copy, line], { opacity: 0, filter: "blur(12px)" });
+
+        gsap
+          .timeline({ scrollTrigger: { trigger: tile, start: "top 88%", once: true } })
+          .to(media, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.15, ease: "power3.out" })
+          .to([...copy, line], { opacity: 1, filter: "blur(0px)", duration: 0.9, stagger: 0.1, ease: "power2.out" }, 0.3);
+
+        gsap.to(media, {
+          yPercent: 5,
+          ease: "none",
+          scrollTrigger: { trigger: tile, start: "top bottom", end: "bottom top", scrub: true },
+        });
+
+        const onEnter = () => {
+          gsap.to(image, { scale: 1.12, duration: 0.9, ease: "power3.out", overwrite: "auto" });
+          gsap.to(line, { width: 72, duration: 0.6, ease: "power3.out", overwrite: "auto" });
+        };
+        const onLeave = () => {
+          gsap.to(image, { scale: 1, duration: 0.9, ease: "power3.out", overwrite: "auto" });
+          gsap.to(line, { width: 40, duration: 0.5, ease: "power3.inOut", overwrite: "auto" });
+        };
+        tile.addEventListener("mouseenter", onEnter);
+        tile.addEventListener("mouseleave", onLeave);
+        cleanups.push(() => {
+          tile.removeEventListener("mouseenter", onEnter);
+          tile.removeEventListener("mouseleave", onLeave);
+        });
+      });
     }, section);
 
-    return () => context.revert();
+    return () => {
+      cleanups.forEach((cleanup) => cleanup());
+      context.revert();
+    };
   }, []);
 
   return (
@@ -72,103 +130,65 @@ export default function Event() {
       <div className="relative w-full py-5 sm:py-8">
         <div className="w-full border-y border-white/15 bg-[rgba(7,26,32,0.28)] px-6 py-12 shadow-[0_30px_90px_rgba(0,0,0,0.35)] backdrop-blur-[22px] sm:px-10 sm:py-16 lg:px-16">
           <div className="mx-auto w-full max-w-[1360px]">
-          <header className="event-chapter relative flex min-h-[72vh] flex-col justify-center pb-14 pt-24 sm:pb-20 sm:pt-28 lg:min-h-[88vh]">
-          <div
-            aria-hidden="true"
-            className="event-chapter__reveal pointer-events-none absolute right-0 top-[20vh] hidden h-[60vh] w-[34vw] max-w-[480px] overflow-hidden rounded-[12px] opacity-60 lg:block"
-          >
-            <Image src="/images/fw-33689354.jpg" alt="" fill sizes="34vw" className="object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#071a20] via-[#071a20]/35 to-transparent" />
-          </div>
-          <div className="relative z-10">
-            <div className="event-chapter__reveal flex items-center gap-4">
-              <span className="h-px w-12 bg-[#df914c]" />
-              <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/60">Events &amp; displays</span>
-            </div>
-            <h2
-              id="events-title"
-              className="event-chapter__reveal mt-7 max-w-[13ch] font-head text-[clamp(2.6rem,7vw,6rem)] font-semibold leading-[0.94] tracking-[-0.045em]"
-            >
-              The night is yours to shape.
-            </h2>
-            <p className="event-chapter__reveal mt-8 max-w-[34rem] text-[14px] leading-[1.85] text-white/70 sm:text-[17px]">
-              From family gatherings to grand village festivals, every display is tailored to your moment with safe, brilliant fireworks.
-            </p>
-            <div className="event-chapter__reveal mt-12 flex items-center gap-3 text-[10px] uppercase tracking-[0.26em] text-white/45">
-              <span>Explore the collection</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-none stroke-current stroke-[1.5]">
-                <path d="M12 4v15m-6-6 6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-          </div>
-        </header>
-
-        <div className="border-t border-white/10">
-          {chapters.map((chapter, index) => (
-            <article
-              key={chapter.title}
-              className="event-chapter grid gap-9 border-b border-white/10 py-16 sm:py-24 lg:grid-cols-2 lg:items-center lg:gap-20"
-            >
-              <div
-                className={`event-chapter__reveal group relative overflow-hidden rounded-[10px] ${
-                  chapter.portrait ? "aspect-[4/5] lg:aspect-[4/5]" : "aspect-[5/4] lg:aspect-[16/11]"
-                } ${index % 2 === 1 ? "lg:order-2" : ""}`}
+            <header className="event-chapter flex min-h-[52vh] flex-col justify-center pb-12 pt-16 lg:min-h-[62vh] lg:pb-16 lg:pt-20">
+              <div className="event-chapter__reveal flex items-center gap-4">
+                <span className="h-px w-12 bg-[#df914c]" />
+                <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/60">Events &amp; displays</span>
+              </div>
+              <h2
+                id="events-title"
+                className="event-chapter__reveal mt-6 max-w-[14ch] font-head text-[clamp(2.6rem,7vw,6rem)] font-semibold leading-[0.94] tracking-[-0.045em]"
               >
-                <Image
-                  src={chapter.image}
-                  alt={chapter.alt}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.05]"
-                />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#041015]/50 via-transparent to-transparent" />
-                <span className="absolute bottom-5 left-5 h-px w-16 bg-[#df914c]" />
-              </div>
+                The night is yours to shape.
+              </h2>
+              <p className="event-chapter__reveal mt-6 max-w-[34rem] text-[14px] leading-[1.85] text-white/70 sm:text-[16px]">
+                From weddings and village festivals to cricket nights and grand celebrations, every display is tailored to your moment with safe,
+                brilliant fireworks.
+              </p>
+            </header>
 
-              <div className={`event-chapter__reveal ${index % 2 === 1 ? "lg:order-1" : ""}`}>
-                <span className="text-[10px] font-medium uppercase tracking-[0.26em] text-[#e0a367]">{chapter.kicker}</span>
-                <h3 className="mt-5 font-head text-[clamp(1.9rem,4vw,3.4rem)] font-semibold leading-[1.05] tracking-[-0.035em]">
-                  {chapter.title}
-                </h3>
-                <div className="mt-7 h-px w-24 bg-white/25" />
-                <p className="mt-7 max-w-[30rem] text-[14px] leading-[1.85] text-white/70 sm:text-[15px]">{chapter.copy}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <section className="event-chapter mt-12 rounded-[14px] border border-white/10 bg-white/[0.06] px-6 py-14 sm:mt-16 sm:px-12 sm:py-20">
-          <div className="event-chapter__reveal flex flex-col gap-12 lg:flex-row lg:items-end lg:justify-between lg:gap-20">
-            <div>
-              <span className="text-[10px] font-medium uppercase tracking-[0.26em] text-[#e0a367]">What we do</span>
-              <h3 className="mt-5 max-w-[19ch] font-head text-[clamp(2rem,4.6vw,3.6rem)] font-semibold leading-[1.05] tracking-[-0.035em]">
-                A display built around your moment.
-              </h3>
-            </div>
-            <ul className="grid gap-5 text-[13px] leading-relaxed text-white/70 sm:grid-cols-3 lg:max-w-[44rem]">
-              {promises.map((promise) => (
-                <li key={promise} className="border-t border-white/20 pt-4">
-                  {promise}
-                </li>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-12 lg:auto-rows-[minmax(170px,23vh)]">
+              {categories.map((category) => (
+                <article
+                  key={category.title}
+                  className={`event-tile group relative overflow-hidden rounded-[10px] aspect-[4/3] lg:aspect-auto ${category.span}`}
+                >
+                  <div className="event-tile__media absolute inset-0 overflow-hidden">
+                    <Image
+                      src={category.image}
+                      alt={category.alt}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 60vw"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#041015]/90 via-[#041015]/25 to-transparent" />
+                  <div className="pointer-events-none absolute inset-0 rounded-[10px] ring-1 ring-inset ring-white/10 transition-colors duration-500 group-hover:ring-[#df914c]/50" />
+                  <div className="absolute inset-x-0 bottom-0 z-10 p-4 sm:p-6">
+                    <span className="event-tile__line block h-px w-10 bg-[#df914c]" />
+                    <h3 className="event-tile__title mt-3 font-head text-[clamp(1.15rem,2vw,2rem)] font-semibold leading-tight tracking-[-0.03em]">
+                      {category.title}
+                    </h3>
+                    <p className="event-tile__copy mt-1.5 text-[11px] leading-relaxed text-white/70 sm:text-[12px]">{category.line}</p>
+                  </div>
+                </article>
               ))}
-            </ul>
-          </div>
-        </section>
+            </div>
 
-        <footer className="event-chapter flex min-h-[56vh] flex-col justify-center py-20">
-          <p className="event-chapter__reveal max-w-[18ch] font-head text-[clamp(2.2rem,6vw,4.8rem)] font-semibold leading-[1.02] tracking-[-0.04em]">
-            Every celebration deserves its own sky.
-          </p>
-          <a
-            href="#home"
-            className="event-chapter__reveal mt-10 inline-flex w-fit items-center gap-3 border-b border-white/35 pb-2 text-[11px] font-medium uppercase tracking-[0.22em] text-white/80 transition-colors hover:border-[#df914c] hover:text-white"
-          >
-            Back to the beginning
-            <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-none stroke-current stroke-[1.5]">
-              <path d="M12 20V5m-6 6 6-6 6 6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </a>
-          </footer>
+            <footer className="event-chapter flex flex-col justify-center gap-6 py-14 lg:flex-row lg:items-end lg:justify-between lg:py-20">
+              <p className="event-chapter__reveal max-w-[20ch] font-head text-[clamp(1.9rem,5vw,3.8rem)] font-semibold leading-[1.04] tracking-[-0.04em]">
+                Every celebration deserves its own sky.
+              </p>
+              <a
+                href="#home"
+                className="event-chapter__reveal inline-flex w-fit items-center gap-3 border-b border-white/35 pb-2 text-[11px] font-medium uppercase tracking-[0.22em] text-white/80 transition-colors hover:border-[#df914c] hover:text-white"
+              >
+                Back to the beginning
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-none stroke-current stroke-[1.5]">
+                  <path d="M12 20V5m-6 6 6-6 6 6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </a>
+            </footer>
           </div>
         </div>
       </div>
