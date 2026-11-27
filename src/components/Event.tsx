@@ -19,7 +19,7 @@ const categories = [
     line: "For the moment the sky joins the celebration.",
     image: weddingImage,
     alt: "Newlyweds beneath sparklers and a shower of fireworks",
-    span: "col-span-2 lg:col-span-7 lg:row-span-2",
+    span: "lg:col-span-7 lg:row-span-2",
   },
   {
     title: "Musical Shows",
@@ -40,21 +40,21 @@ const categories = [
     line: "For one more wish, and one bigger spark.",
     image: birthdayImage,
     alt: "Friends gathered around a birthday cake with lit candles",
-    span: "lg:col-span-4",
+    span: "lg:col-span-4 lg:min-h-[280px]",
   },
   {
     title: "Religious Events",
     line: "For moments of devotion lit with reverence.",
     image: religiousImage,
     alt: "Devotional gathering illuminated by ceremonial lights at night",
-    span: "lg:col-span-4",
+    span: "lg:col-span-4 lg:min-h-[280px]",
   },
   {
     title: "Festivals",
     line: "For a sky that belongs to everyone.",
     image: festivalImage,
     alt: "Crowd watching a brilliant fireworks display at a night festival",
-    span: "lg:col-span-4",
+    span: "lg:col-span-4 lg:min-h-[280px]",
   },
 ];
 
@@ -133,10 +133,10 @@ export default function Event() {
 
   return (
     <section id="events" ref={root} aria-labelledby="events-title" className="relative text-white">
-      <div className="relative w-full py-5 sm:py-8">
-        <div className="w-full border-y border-white/15 bg-[rgba(7,26,32,0.28)] px-6 py-12 shadow-[0_30px_90px_rgba(0,0,0,0.35)] backdrop-blur-[22px] sm:px-10 sm:py-16 lg:px-16">
+      <div className="relative w-full py-2 sm:py-8">
+        <div className="w-full border-y border-white/15 bg-[rgba(7,26,32,0.28)] px-6 py-8 shadow-[0_30px_90px_rgba(0,0,0,0.35)] backdrop-blur-[22px] sm:px-10 sm:py-16 lg:px-16">
           <div className="mx-auto w-full max-w-[1360px]">
-            <header className="event-chapter flex min-h-[52vh] flex-col justify-center pb-12 pt-16 lg:min-h-[62vh] lg:pb-16 lg:pt-20">
+            <header className="event-chapter flex flex-col justify-center pb-8 pt-10 sm:min-h-[52vh] sm:pb-12 sm:pt-16 lg:min-h-[62vh] lg:pb-16 lg:pt-20">
               <div className="event-chapter__reveal flex items-center gap-4">
                 <span className="h-px w-12 bg-[#df914c]" />
                 <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/60">Events &amp; displays</span>
@@ -153,11 +153,11 @@ export default function Event() {
               </p>
             </header>
 
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-12 lg:auto-rows-[minmax(170px,23vh)]">
+            <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-12 lg:auto-rows-[minmax(170px,23vh)]">
               {categories.map((category) => (
                 <article
                   key={category.title}
-                  className={`event-tile group relative overflow-hidden rounded-[10px] aspect-[4/3] lg:aspect-auto ${category.span}`}
+                  className={`event-tile group relative overflow-hidden rounded-[10px] aspect-[16/10] lg:aspect-auto ${category.span}`}
                 >
                   <div className="event-tile__media absolute inset-0 overflow-hidden">
                     <Image
@@ -181,7 +181,8 @@ export default function Event() {
               ))}
             </div>
 
-            <footer className="event-chapter flex flex-col justify-center gap-6 py-14 lg:flex-row lg:items-end lg:justify-between lg:py-20">
+            {/* Every Celebration - Content Points */}
+            <footer className="event-chapter flex flex-col justify-center gap-6 py-10 lg:flex-row lg:items-end lg:justify-between lg:py-20 lg:pt-32">
               <p className="event-chapter__reveal max-w-[20ch] font-head text-[clamp(1.9rem,5vw,3.8rem)] font-semibold leading-[1.04] tracking-[-0.04em]">
                 Every celebration deserves its own sky.
               </p>
