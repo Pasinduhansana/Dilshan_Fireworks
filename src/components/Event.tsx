@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import birthdayImage from "../../public/images/events/birthday.jpg";
-import corporateImage from "../../public/images/events/corporate.jpg";
+import religiousImage from "../../public/images/events/religious.jpg";
 import cricketImage from "../../public/images/events/cricket.jpg";
 import festivalImage from "../../public/images/events/festival.jpg";
 import musicImage from "../../public/images/events/music.jpg";
@@ -43,10 +43,10 @@ const categories = [
     span: "lg:col-span-4",
   },
   {
-    title: "Corporate Events",
-    line: "For the night after the final keynote.",
-    image: corporateImage,
-    alt: "Speaker addressing an audience at a corporate conference",
+    title: "Religious Events",
+    line: "For moments of devotion lit with reverence.",
+    image: religiousImage,
+    alt: "Devotional gathering illuminated by ceremonial lights at night",
     span: "lg:col-span-4",
   },
   {
