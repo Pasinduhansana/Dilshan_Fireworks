@@ -1,6 +1,6 @@
 import Image from "next/image";
 import CinematicIntro from "@/components/CinematicIntro";
-import RocketScene from "@/components/RocketScene";
+import RocketScene from "@/components/3D/RocketScene";
 
 const navLinks = [
   { label: "Home", href: "#home" },

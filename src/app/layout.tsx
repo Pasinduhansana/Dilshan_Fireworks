@@ -16,8 +16,7 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: "Dilshan Fireworks — Celebration Fireworks in Sri Lanka",
-  description:
-    "Safe, hand-picked fireworks and dazzling displays for celebrations across Sri Lanka. Make every night one to remember.",
+  description: "Safe, hand-picked fireworks and dazzling displays for celebrations across Sri Lanka. Make every night one to remember.",
 };
 
 export const viewport = {
@@ -26,7 +25,7 @@ export const viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`h-full ${dmSans.variable} ${outfit.variable}`}>
+    <html lang="en" className={`h-full ${dmSans.variable} ${outfit.variable}`} suppressHydrationWarning>
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
