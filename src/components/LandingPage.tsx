@@ -66,7 +66,10 @@ export default function LandingPage() {
         <div className="hero-scrim pointer-events-none absolute inset-0" />
 
         {/* Three.js Rocket Visual */}
-        <div className="pointer-events-none absolute right-[2%] top-[16%] z-[5] h-[42%] w-[52%] sm:right-[8%] sm:top-[15%] sm:h-[58%] sm:w-[44%] lg:right-[10%] lg:top-[18%] lg:h-[55%] lg:w-[45%]">
+        <div
+          data-rocket-flight
+          className="pointer-events-none absolute left-1/2 top-[14%] z-[40] h-[46%] w-[72%] sm:top-[12%] sm:h-[60%] sm:w-[52%] lg:top-[10%] lg:h-[68%] lg:w-[38%]"
+        >
           <div className="pointer-events-auto h-full w-full">
             <RocketScene />
           </div>

@@ -27,6 +27,10 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
     const foreground = Array.from(landingShell.querySelectorAll<HTMLElement>(".intro-element")).filter(
       (element) => element.tagName !== "NAV",
     );
+    const rocketFlight = landingShell.querySelector<HTMLElement>("[data-rocket-flight]");
+    const rocketParent = rocketFlight?.parentElement ?? null;
+    const rocketNextSibling = rocketFlight?.nextSibling ?? null;
+    if (rocketFlight) journey.appendChild(rocketFlight);
 
     landingShell.style.isolation = "auto";
     const innerSection = landingShell.querySelector<HTMLElement>("section");
@@ -127,8 +131,83 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
     const handleResize = () => {
       pinNavbar();
       placeIndicator(activeLink, false);
+      placeRocket();
     };
     window.addEventListener("resize", handleResize);
+
+    let rocketCleanup: (() => void) | null = null;
+    const placeRocket = () => {
+      if (!rocketFlight || !innerSection) return;
+      const rect = innerSection.getBoundingClientRect();
+      const isLg = window.innerWidth >= 1024;
+      const isSm = window.innerWidth >= 640;
+      const width = rect.width * (isLg ? 0.38 : isSm ? 0.52 : 0.72);
+      const height = rect.height * (isLg ? 0.68 : isSm ? 0.6 : 0.46);
+      Object.assign(rocketFlight.style, {
+        position: "fixed",
+        left: `${rect.left + rect.width / 2 - width / 2}px`,
+        top: `${rect.top + rect.height * (isLg ? 0.1 : isSm ? 0.12 : 0.14)}px`,
+        width: `${width}px`,
+        height: `${height}px`,
+        zIndex: "45",
+        pointerEvents: "none",
+        transform: "none",
+      });
+    };
+
+    if (rocketFlight) {
+      placeRocket();
+      gsap.set(rocketFlight, { transformOrigin: "50% 50%", zIndex: 45 });
+      if (reduced) {
+        gsap.set(rocketFlight, { xPercent: 0, yPercent: 0, scale: 1, rotation: 0, opacity: 1 });
+      } else {
+        let flight: gsap.core.Timeline | null = null;
+        const intro = gsap.fromTo(
+          rocketFlight,
+          { yPercent: 115, xPercent: 0, scale: 0.88, rotation: -6, opacity: 0.96 },
+          {
+            yPercent: 0,
+            xPercent: 0,
+            scale: 1,
+            rotation: 0,
+            opacity: 1,
+            duration: 2.2,
+            ease: "power3.out",
+            delay: 0.2,
+            onComplete: () => {
+              flight = gsap.timeline({
+                defaults: { ease: "none" },
+                scrollTrigger: {
+                  trigger: journey,
+                  start: "top top",
+                  endTrigger: eventShell,
+                  end: "bottom bottom",
+                  scrub: 1.15,
+                  invalidateOnRefresh: true,
+                  onRefresh: placeRocket,
+                },
+              });
+
+              flight
+                .to(rocketFlight, { xPercent: 6, yPercent: -18, scale: 0.92, rotation: 35, duration: 0.22 })
+                .to(rocketFlight, { xPercent: 18, yPercent: -8, scale: 0.82, rotation: 110, duration: 0.2 })
+                .to(rocketFlight, { xPercent: 28, yPercent: 18, scale: 0.72, rotation: 180, duration: 0.2 })
+                .to(rocketFlight, { xPercent: 34, yPercent: 70, scale: 0.58, rotation: 180, duration: 0.2 })
+                .to(rocketFlight, { xPercent: 36, yPercent: 170, scale: 0.44, rotation: 185, duration: 0.18 });
+            },
+          },
+        );
+
+        rocketCleanup = () => {
+          intro.kill();
+          flight?.scrollTrigger?.kill();
+          flight?.kill();
+          gsap.set(rocketFlight, { clearProps: "transform,opacity,zIndex" });
+          rocketFlight.style.cssText = "";
+          if (rocketParent) rocketParent.insertBefore(rocketFlight, rocketNextSibling);
+        };
+      }
+    }
 
     let transition: gsap.core.Timeline | null = null;
 
@@ -234,6 +313,10 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
       window.removeEventListener("touchstart", handleInterrupt);
       window.removeEventListener("keydown", handleInterrupt);
       window.removeEventListener("resize", handleResize);
+      rocketCleanup?.();
+      if (rocketFlight && rocketParent && !rocketParent.contains(rocketFlight)) {
+        rocketParent.insertBefore(rocketFlight, rocketNextSibling);
+      }
       indicator?.remove();
       if (navbar && navParent) navParent.insertBefore(navbar, navNextSibling);
       stopScrollTween();

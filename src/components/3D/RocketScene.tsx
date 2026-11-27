@@ -34,8 +34,12 @@ function RocketModel() {
     return { bodyTexture: body, capTexture: cap };
   }, [bodyMap, capMap]);
 
-  useFrame((_, delta) => {
+  useFrame(({ clock }, delta) => {
     if (!rocket.current) return;
+    if (!isDragging.current) {
+      targetRotation.current.y += delta * 0.45;
+      targetRotation.current.x = Math.sin(clock.elapsedTime * 0.55) * 0.18;
+    }
     rocket.current.rotation.x = THREE.MathUtils.damp(
       rocket.current.rotation.x,
       targetRotation.current.x,
@@ -59,6 +63,9 @@ function RocketModel() {
         isDragging.current = true;
         drag.current.x = event.nativeEvent.clientX;
         drag.current.y = event.nativeEvent.clientY;
+        if (event.target instanceof Element) {
+          event.target.setPointerCapture(event.pointerId);
+        }
       }}
       onPointerMove={(event) => {
         if (!isDragging.current) return;
@@ -71,10 +78,13 @@ function RocketModel() {
         targetRotation.current.x += dy * 0.008;
         targetRotation.current.x = THREE.MathUtils.clamp(targetRotation.current.x, -1.2, 1.2);
       }}
-      onPointerUp={() => {
+      onPointerUp={(event) => {
         isDragging.current = false;
+        if (event.target instanceof Element && event.target.hasPointerCapture(event.pointerId)) {
+          event.target.releasePointerCapture(event.pointerId);
+        }
       }}
-      onPointerLeave={() => {
+      onPointerCancel={() => {
         isDragging.current = false;
       }}
     >
