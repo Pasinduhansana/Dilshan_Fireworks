@@ -1,5 +1,6 @@
 import Image from "next/image";
 import CinematicIntro from "@/components/CinematicIntro";
+import RocketScene from "@/components/RocketScene";
 
 const navLinks = [
   { label: "Home", href: "#home" },
@@ -43,6 +44,13 @@ export default function LandingPage() {
         />
         <div className="hero-scrim pointer-events-none absolute inset-0" />
 
+        {/* Three.js Rocket Visual */}
+        <div className="pointer-events-none absolute right-[10%] top-[18%] z-[5] h-[55%] w-[45%] sm:right-[12%] sm:top-[15%] sm:h-[70%] sm:w-[42%]">
+          <div className="pointer-events-auto h-full w-full">
+            <RocketScene />
+          </div>
+        </div>
+        
         <Image
           src="/images/logo.png"
           alt="Dilshan Fireworks"
