@@ -4,6 +4,12 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import birthdayImage from "../../public/images/events/birthday.jpg";
+import corporateImage from "../../public/images/events/corporate.jpg";
+import cricketImage from "../../public/images/events/cricket.jpg";
+import festivalImage from "../../public/images/events/festival.jpg";
+import musicImage from "../../public/images/events/music.jpg";
+import weddingImage from "../../public/images/events/wedding.jpg";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,42 +17,42 @@ const categories = [
   {
     title: "Weddings",
     line: "For the moment the sky joins the celebration.",
-    image: "/images/events/wedding.jpg",
+    image: weddingImage,
     alt: "Newlyweds beneath sparklers and a shower of fireworks",
     span: "col-span-2 lg:col-span-7 lg:row-span-2",
   },
   {
     title: "Musical Shows",
     line: "For the songs you feel more than hear.",
-    image: "/images/events/music.jpg",
+    image: musicImage,
     alt: "Concert crowd beneath red pyrotechnic fireworks and stage lights",
     span: "lg:col-span-5",
   },
   {
     title: "Cricket Matches",
     line: "For the last ball under the floodlights.",
-    image: "/images/events/cricket.jpg",
+    image: cricketImage,
     alt: "Floodlit cricket stadium filled with spectators at night",
     span: "lg:col-span-5",
   },
   {
     title: "Birthday Parties",
     line: "For one more wish, and one bigger spark.",
-    image: "/images/events/birthday.jpg",
+    image: birthdayImage,
     alt: "Friends gathered around a birthday cake with lit candles",
     span: "lg:col-span-4",
   },
   {
     title: "Corporate Events",
     line: "For the night after the final keynote.",
-    image: "/images/events/corporate.jpg",
+    image: corporateImage,
     alt: "Speaker addressing an audience at a corporate conference",
     span: "lg:col-span-4",
   },
   {
     title: "Festivals",
     line: "For a sky that belongs to everyone.",
-    image: "/images/events/festival.jpg",
+    image: festivalImage,
     alt: "Crowd watching a brilliant fireworks display at a night festival",
     span: "lg:col-span-4",
   },
