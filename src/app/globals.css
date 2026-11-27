@@ -57,14 +57,22 @@ body {
 
 /* Three.js Rocket Container */
 
+
 .rocket-scene {
   position: relative;
   width: 100%;
   height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+
+.rocket-scene:active {
+  cursor: grabbing;
 }
 
 .rocket-scene canvas {
   display: block;
   width: 100% !important;
   height: 100% !important;
+  touch-action: none;
 }

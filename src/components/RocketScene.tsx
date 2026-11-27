@@ -2,7 +2,7 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 
@@ -60,20 +60,26 @@ function Flame() {
   );
 }
 
+function createSparks() {
+  let state = 123456789;
+  const random = () => {
+    state = (1664525 * state + 1013904223) % 4294967296;
+    return state / 4294967296;
+  };
+
+  const positions = new Float32Array(100 * 3);
+  const seeds = Array.from({ length: 100 }, () => ({
+    angle: random() * Math.PI * 2,
+    speed: 0.3 + random() * 1.8,
+    phase: random() * 5,
+  }));
+
+  return { positions, seeds };
+}
+
 function Sparks() {
   const sparksRef = useRef<THREE.Points>(null);
-
-  const positions = useRef(
-    new Float32Array(100 * 3)
-  );
-
-  const seeds = useRef(
-    Array.from({ length: 100 }, () => ({
-      angle: Math.random() * Math.PI * 2,
-      speed: 0.3 + Math.random() * 1.8,
-      phase: Math.random() * 5,
-    }))
-  );
+  const { positions, seeds } = useMemo(() => createSparks(), []);
 
   useFrame((state) => {
     if (!sparksRef.current) return;
@@ -81,8 +87,8 @@ function Sparks() {
     const t = state.clock.elapsedTime;
     const array = sparksRef.current.geometry.attributes.position.array as Float32Array;
 
-    for (let i = 0; i < seeds.current.length; i++) {
-      const seed = seeds.current[i];
+    for (let i = 0; i < seeds.length; i++) {
+      const seed = seeds[i];
       const progress = ((t + seed.phase) % 1.5) / 1.5;
       const radius = progress * seed.speed;
 
@@ -99,7 +105,7 @@ function Sparks() {
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          args={[positions.current, 3]}
+          args={[positions, 3]}
         />
       </bufferGeometry>
 
@@ -116,55 +122,76 @@ function Sparks() {
 
 function RocketModel() {
   const rocketRef = useRef<THREE.Group>(null);
-  const targetRotation = useRef({ x: 0, y: 0 });
 
-  const texture = useTexture("/rocket-texture.png");
+  const dragging = useRef(false);
 
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.ClampToEdgeWrapping;
-  texture.anisotropy = 8;
+  const [bodyMap, capMap] = useTexture([
+    "/rocket-texture.png",
+    "/rocket-cap.png",
+  ]);
 
-  useFrame((state, delta) => {
-    if (!rocketRef.current) return;
+  const { bodyTexture, capTexture } = useMemo(() => {
+    const body = bodyMap.clone();
+    body.colorSpace = THREE.SRGBColorSpace;
+    body.wrapS = THREE.RepeatWrapping;
+    body.wrapT = THREE.ClampToEdgeWrapping;
+    body.anisotropy = 8;
+    body.needsUpdate = true;
+
+    const cap = capMap.clone();
+    cap.colorSpace = THREE.SRGBColorSpace;
+    cap.wrapS = THREE.RepeatWrapping;
+    cap.wrapT = THREE.ClampToEdgeWrapping;
+    cap.anisotropy = 8;
+    cap.needsUpdate = true;
+
+    return { bodyTexture: body, capTexture: cap };
+  }, [bodyMap, capMap]);
+
+  useFrame((state) => {
+    if (!rocketRef.current || dragging.current) return;
 
     const rocket = rocketRef.current;
 
     rocket.position.y = Math.sin(state.clock.elapsedTime * 0.8) * 0.08;
-
-    rocket.rotation.x = THREE.MathUtils.damp(
-      rocket.rotation.x,
-      targetRotation.current.x,
-      4,
-      delta
-    );
-
-    rocket.rotation.y = THREE.MathUtils.damp(
-      rocket.rotation.y,
-      targetRotation.current.y,
-      4,
-      delta
-    );
   });
 
   return (
     <group
       ref={rocketRef}
-      onPointerMove={(event) => {
-        targetRotation.current.x = event.point.y * 0.12;
-        targetRotation.current.y = event.point.x * 0.18;
+      onPointerDown={(event) => {
+        dragging.current = true;
+        if (event.target instanceof Element) {
+          event.target.setPointerCapture(event.pointerId);
+        }
       }}
-      onPointerLeave={() => {
-        targetRotation.current.x = 0;
-        targetRotation.current.y = 0;
+      onPointerMove={(event) => {
+        if (!dragging.current || !rocketRef.current) return;
+
+        rocketRef.current.rotation.y += event.movementX * 0.008;
+        rocketRef.current.rotation.x += event.movementY * 0.008;
+
+        rocketRef.current.rotation.x = THREE.MathUtils.clamp(
+          rocketRef.current.rotation.x,
+          -1.2,
+          1.2
+        );
+      }}
+      onPointerUp={(event) => {
+        dragging.current = false;
+        if (event.target instanceof Element) {
+          event.target.releasePointerCapture(event.pointerId);
+        }
+      }}
+      onPointerCancel={() => {
+        dragging.current = false;
       }}
     >
       {/* Textured rocket body */}
       <mesh>
         <cylinderGeometry args={[BODY_RADIUS, BODY_RADIUS, BODY_HEIGHT, 96, 1]} />
-
         <meshPhysicalMaterial
-          map={texture}
+          map={bodyTexture}
           metalness={0.35}
           roughness={0.28}
           clearcoat={1}
@@ -172,14 +199,15 @@ function RocketModel() {
         />
       </mesh>
 
-      {/* Rocket nose cone */}
+      {/* Textured nose cone */}
       <mesh position={[0, 1.52, 0]}>
         <coneGeometry args={[BODY_RADIUS, 0.75, 96]} />
         <meshPhysicalMaterial
-          color="#7200bd"
-          metalness={0.78}
-          roughness={0.19}
+          map={capTexture}
+          metalness={0.45}
+          roughness={0.22}
           clearcoat={1}
+          clearcoatRoughness={0.12}
         />
       </mesh>
 
