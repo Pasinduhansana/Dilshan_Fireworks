@@ -72,17 +72,28 @@ export default function Event() {
         const pieces = chapter.querySelectorAll<HTMLElement>(".event-chapter__reveal");
         if (!pieces.length) return;
 
-        gsap.set(pieces, { opacity: 0, filter: "blur(24px)" });
-        gsap.to(pieces, {
+        const hide = () => gsap.set(pieces, { opacity: 0, filter: "blur(24px)" });
+        hide();
+        const reveal = gsap.timeline({ paused: true }).to(pieces, {
           opacity: 1,
           filter: "blur(0px)",
           duration: 1.4,
           ease: "power2.out",
           stagger: 0.15,
-          scrollTrigger: {
-            trigger: chapter,
-            start: chapter.tagName === "HEADER" ? "top 15%" : "top 85%",
-            once: true,
+        });
+
+        ScrollTrigger.create({
+          trigger: chapter,
+          start: chapter.tagName === "HEADER" ? "top 15%" : "top 85%",
+          onEnter: () => reveal.restart(),
+          onEnterBack: () => reveal.restart(),
+          onLeave: () => {
+            reveal.pause(0);
+            hide();
+          },
+          onLeaveBack: () => {
+            reveal.pause(0);
+            hide();
           },
         });
       });
@@ -94,13 +105,34 @@ export default function Event() {
         const copy = tile.querySelectorAll<HTMLElement>(".event-tile__title, .event-tile__copy");
         if (!media || !image || !line) return;
 
-        gsap.set(media, { clipPath: "inset(100% 0% 0% 0%)", scale: 1.14, yPercent: -5 });
-        gsap.set([...copy, line], { opacity: 0, filter: "blur(12px)" });
+        const resetReveal = () => {
+          gsap.set(media, { clipPath: "inset(100% 0% 0% 0%)", scale: 1.14 });
+          gsap.set([...copy, line], { opacity: 0, filter: "blur(12px)" });
+          gsap.set(image, { scale: 1 });
+          gsap.set(line, { width: 40 });
+        };
 
-        gsap
-          .timeline({ scrollTrigger: { trigger: tile, start: "top 88%", once: true } })
+        gsap.set(media, { yPercent: -5 });
+        resetReveal();
+
+        const reveal = gsap.timeline({ paused: true })
           .to(media, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.15, ease: "power3.out" })
           .to([...copy, line], { opacity: 1, filter: "blur(0px)", duration: 0.9, stagger: 0.1, ease: "power2.out" }, 0.3);
+
+        ScrollTrigger.create({
+          trigger: tile,
+          start: "top 88%",
+          onEnter: () => reveal.restart(),
+          onEnterBack: () => reveal.restart(),
+          onLeave: () => {
+            reveal.pause(0);
+            resetReveal();
+          },
+          onLeaveBack: () => {
+            reveal.pause(0);
+            resetReveal();
+          },
+        });
 
         gsap.to(media, {
           yPercent: 5,
@@ -123,6 +155,8 @@ export default function Event() {
           tile.removeEventListener("mouseleave", onLeave);
         });
       });
+
+      ScrollTrigger.refresh();
     }, section);
 
     return () => {
@@ -134,26 +168,26 @@ export default function Event() {
   return (
     <section id="events" ref={root} aria-labelledby="events-title" className="relative text-white">
       <div className="relative w-full py-2 sm:py-8">
-        <div className="w-full border-y border-white/15 bg-[rgba(7,26,32,0.28)] px-6 py-8 shadow-[0_30px_90px_rgba(0,0,0,0.35)] backdrop-blur-[22px] sm:px-10 sm:py-16 lg:px-16">
-          <div className="mx-auto w-full max-w-[1360px]">
-            <header className="event-chapter flex flex-col justify-center pb-8 pt-10 sm:min-h-[52vh] sm:pb-12 sm:pt-16 lg:min-h-[62vh] lg:pb-16 lg:pt-20">
+        <div className="w-full border-y border-white/15 bg-[rgba(7,26,32,0.28)] px-6 py-8 shadow-[0_30px_90px_rgba(0,0,0,0.35)] backdrop-blur-[22px] sm:px-10 sm:py-16 lg:px-16 2xl:px-24 2xl:py-20">
+          <div className="mx-auto w-full max-w-[1360px] 2xl:max-w-[1680px]">
+            <header className="event-chapter flex flex-col justify-center pb-8 pt-10 sm:min-h-[52vh] sm:pb-12 sm:pt-16 lg:min-h-[62vh] lg:pb-16 lg:pt-20 2xl:min-h-[58vh] 2xl:pb-24 2xl:pt-24">
               <div className="event-chapter__reveal flex items-center gap-4">
-                <span className="h-px w-12 bg-[#df914c]" />
-                <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/60">Events &amp; displays</span>
+                <span className="h-px w-12 bg-[#df914c] 2xl:w-16" />
+                <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/60 2xl:text-[11px]">Events &amp; displays</span>
               </div>
               <h2
                 id="events-title"
-                className="event-chapter__reveal mt-6 max-w-[14ch] font-head text-[clamp(2.6rem,7vw,6rem)] font-semibold leading-[0.94] tracking-[-0.045em]"
+                className="event-chapter__reveal mt-6 max-w-[14ch] font-head text-[clamp(2.6rem,7vw,6rem)] font-semibold leading-[0.94] tracking-[-0.045em] 2xl:text-[7rem]"
               >
                 The night is yours to shape.
               </h2>
-              <p className="event-chapter__reveal mt-6 max-w-[34rem] text-[14px] leading-[1.85] text-white/70 sm:text-[16px]">
+              <p className="event-chapter__reveal mt-6 max-w-[34rem] text-[14px] leading-[1.85] text-white/70 sm:text-[16px] 2xl:max-w-[40rem] 2xl:text-[18px]">
                 From weddings and village festivals to cricket nights and grand celebrations, every display is tailored to your moment with safe,
                 brilliant fireworks.
               </p>
             </header>
 
-            <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-12 lg:auto-rows-[minmax(170px,23vh)]">
+            <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-12 lg:auto-rows-[minmax(170px,23vh)] 2xl:gap-6 2xl:auto-rows-[minmax(220px,24vh)]">
               {categories.map((category) => (
                 <article
                   key={category.title}
@@ -170,25 +204,25 @@ export default function Event() {
                   </div>
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#041015]/90 via-[#041015]/25 to-transparent" />
                   <div className="pointer-events-none absolute inset-0 rounded-[10px] ring-1 ring-inset ring-white/10 transition-colors duration-500 group-hover:ring-[#df914c]/50" />
-                  <div className="absolute inset-x-0 bottom-0 z-10 p-4 sm:p-6">
+                  <div className="absolute inset-x-0 bottom-0 z-10 p-4 sm:p-6 2xl:p-8">
                     <span className="event-tile__line block h-px w-10 bg-[#df914c]" />
-                    <h3 className="event-tile__title mt-3 font-head text-[clamp(1.15rem,2vw,2rem)] font-semibold leading-tight tracking-[-0.03em]">
+                    <h3 className="event-tile__title mt-3 font-head text-[clamp(1.15rem,2vw,2rem)] font-semibold leading-tight tracking-[-0.03em] 2xl:text-[2.35rem]">
                       {category.title}
                     </h3>
-                    <p className="event-tile__copy mt-1.5 text-[11px] leading-relaxed text-white/70 sm:text-[12px]">{category.line}</p>
+                    <p className="event-tile__copy mt-1.5 text-[11px] leading-relaxed text-white/70 sm:text-[12px] 2xl:mt-2 2xl:text-[14px]">{category.line}</p>
                   </div>
                 </article>
               ))}
             </div>
 
             {/* Every Celebration - Content Points */}
-            <footer className="event-chapter flex flex-col justify-center gap-6 py-10 lg:flex-row lg:items-end lg:justify-between lg:py-20 lg:pt-32">
-              <p className="event-chapter__reveal max-w-[20ch] font-head text-[clamp(1.9rem,5vw,3.8rem)] font-semibold leading-[1.04] tracking-[-0.04em]">
+            <footer className="event-chapter flex flex-col justify-center gap-6 py-10 lg:flex-row lg:items-end lg:justify-between lg:py-20 lg:pt-32 2xl:py-24 2xl:pt-40">
+              <p className="event-chapter__reveal max-w-[20ch] font-head text-[clamp(1.9rem,5vw,3.8rem)] font-semibold leading-[1.04] tracking-[-0.04em] 2xl:text-[4.5rem]">
                 Every celebration deserves its own sky.
               </p>
               <a
                 href="#home"
-                className="event-chapter__reveal inline-flex w-fit items-center gap-3 border-b border-white/35 pb-2 text-[11px] font-medium uppercase tracking-[0.22em] text-white/80 transition-colors hover:border-[#df914c] hover:text-white"
+                className="event-chapter__reveal inline-flex w-fit items-center gap-3 border-b border-white/35 pb-2 text-[11px] font-medium uppercase tracking-[0.22em] text-white/80 transition-colors hover:border-[#df914c] hover:text-white 2xl:text-[12px]"
               >
                 Back to the beginning
                 <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-none stroke-current stroke-[1.5]">

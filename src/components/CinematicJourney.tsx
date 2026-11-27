@@ -202,6 +202,9 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
             end: "+=100%",
             scrub: 1,
             invalidateOnRefresh: true,
+            onLeaveBack: () => {
+              gsap.set(foreground, { y: 0, opacity: 1, filter: "blur(0px)" });
+            },
           },
         });
 
