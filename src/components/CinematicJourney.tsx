@@ -32,13 +32,18 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
     const innerSection = landingShell.querySelector<HTMLElement>("section");
     if (innerSection) innerSection.style.isolation = "auto";
 
-    const navbar = landingShell.querySelector<HTMLElement>("nav");
+    const navbar = landingShell.querySelector<HTMLElement>("nav[data-desktop-nav]") ?? landingShell.querySelector<HTMLElement>("nav:not([data-mobile-nav])");
     const navParent = navbar?.parentElement ?? null;
     const navNextSibling = navbar?.nextSibling ?? null;
     if (navbar && navParent) journey.appendChild(navbar);
 
     const pinNavbar = () => {
       if (!navbar || !innerSection) return;
+      if (window.innerWidth < 1024) {
+        navbar.style.display = "none";
+        return;
+      }
+      navbar.style.display = "";
       let documentTop = 0;
       let node: HTMLElement | null = innerSection;
       while (node) {

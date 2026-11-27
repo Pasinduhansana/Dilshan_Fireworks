@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import CinematicIntro from "@/components/CinematicIntro";
 import RocketScene from "@/components/3D/RocketScene";
 
@@ -31,6 +34,24 @@ const socials = [
 ];
 
 export default function LandingPage() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [mobileOpen]);
+
+  const closeMobile = () => setMobileOpen(false);
+
   return (
     <CinematicIntro className="relative h-[100dvh] min-h-[560px] w-full overflow-hidden bg-[#f7f8f4] p-[7px] sm:p-[10px]">
       <section className="relative isolate h-full w-full overflow-hidden rounded-[9px] sm:rounded-[12px]">
@@ -45,24 +66,25 @@ export default function LandingPage() {
         <div className="hero-scrim pointer-events-none absolute inset-0" />
 
         {/* Three.js Rocket Visual */}
-        <div className="pointer-events-none absolute right-[10%] top-[18%] z-[5] h-[55%] w-[45%] sm:right-[12%] sm:top-[15%] sm:h-[70%] sm:w-[42%]">
+        <div className="pointer-events-none absolute right-[2%] top-[16%] z-[5] h-[42%] w-[52%] sm:right-[8%] sm:top-[15%] sm:h-[58%] sm:w-[44%] lg:right-[10%] lg:top-[18%] lg:h-[55%] lg:w-[45%]">
           <div className="pointer-events-auto h-full w-full">
             <RocketScene />
           </div>
         </div>
-        
+
         <Image
           src="/images/logo.png"
           alt="Dilshan Fireworks"
           width={500}
           height={500}
           priority
-          className="intro-element absolute left-[3%] top-[10%] z-20 h-auto w-[86px] sm:left-[4%] sm:top-[4%] sm:w-[150px]"
+          className="intro-element absolute left-[3%] top-[10%] z-20 hidden h-auto w-[86px] sm:left-[4%] sm:top-[4%] sm:w-[150px] lg:block"
         />
 
         <nav
           aria-label="Primary"
-          className="intro-element absolute right-[2%] top-[4%] z-20 flex items-center gap-0.5 rounded-full border border-white/70 bg-[#f7f8f4]/95 p-[5px] shadow-[0_10px_32px_rgba(6,28,34,0.3)] backdrop-blur-sm sm:gap-1 sm:p-[7px]"
+          data-desktop-nav
+          className="intro-element absolute right-[2%] top-[4%] z-20 hidden items-center gap-0.5 rounded-full border border-white/70 bg-[#f7f8f4]/95 p-[5px] shadow-[0_10px_32px_rgba(6,28,34,0.3)] backdrop-blur-sm sm:gap-1 sm:p-[7px] lg:flex"
         >
           {navLinks.map((link, index) => (
             <a
@@ -79,8 +101,73 @@ export default function LandingPage() {
           ))}
         </nav>
 
+        <div data-mobile-nav className="absolute inset-x-0 top-0 z-40 lg:hidden">
+          <div className="intro-element flex items-center justify-between px-[4%] pt-[4%] sm:pt-[3%]">
+            <a href="#home" onClick={closeMobile} className="relative z-[60] block">
+              <Image
+                src="/images/logo.png"
+                alt="Dilshan Fireworks"
+                width={500}
+                height={500}
+                priority
+                className="h-auto w-[86px] sm:w-[110px]"
+              />
+            </a>
+            <button
+              type="button"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-menu-panel"
+              onClick={() => setMobileOpen((v) => !v)}
+              className="relative z-[60] flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-[#163b42]/35 text-white backdrop-blur-md transition-colors hover:bg-[#163b42]/50"
+            >
+              <span className="sr-only">{mobileOpen ? "Close menu" : "Open menu"}</span>
+              <span className="relative h-4 w-5">
+                <span
+                  className={`absolute left-0 h-[1.5px] w-5 bg-current transition-all duration-300 ${mobileOpen ? "top-[7px] rotate-45" : "top-0"}`}
+                />
+                <span
+                  className={`absolute left-0 top-[7px] h-[1.5px] w-5 bg-current transition-all duration-300 ${mobileOpen ? "opacity-0" : "opacity-100"}`}
+                />
+                <span
+                  className={`absolute left-0 h-[1.5px] w-5 bg-current transition-all duration-300 ${mobileOpen ? "top-[7px] -rotate-45" : "top-[14px]"}`}
+                />
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div
+          className={`fixed inset-0 z-[55] bg-[#081f24]/45 backdrop-blur-[2px] transition-opacity duration-300 lg:hidden ${mobileOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
+          onClick={closeMobile}
+          aria-hidden="true"
+        />
+
+        <nav
+          id="mobile-menu-panel"
+          aria-label="Mobile navigation"
+          className={`fixed inset-x-[4%] top-[calc(env(safe-area-inset-top,0px)+76px)] z-[60] origin-top rounded-[20px] border border-white/15 bg-[rgba(10,38,44,0.88)] p-5 shadow-[0_24px_60px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-all duration-300 sm:inset-x-auto sm:right-[4%] sm:w-[320px] lg:hidden ${mobileOpen ? "pointer-events-auto translate-y-0 scale-100 opacity-100" : "pointer-events-none -translate-y-3 scale-[0.98] opacity-0"}`}
+        >
+          <div className="flex flex-col gap-1">
+            {navLinks.map((link, index) => (
+              <a
+                key={link.label}
+                href={link.href}
+                onClick={closeMobile}
+                className={
+                  index === 0
+                    ? "rounded-full bg-gradient-to-b from-[#ebac6b] to-[#d5843f] px-4 py-3 text-[13px] font-semibold text-white shadow-[0_4px_12px_rgba(190,105,45,0.35)]"
+                    : "rounded-full px-4 py-3 text-[13px] font-medium text-white/88 transition-colors hover:bg-white/10 hover:text-white"
+                }
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </nav>
+
         {/* Bottom left Content */}
-        <div className="intro-element absolute bottom-[10%] left-[4%] z-10 w-[88%] sm:bottom-[8%] sm:w-[56%]">
+        <div className="intro-element absolute bottom-[8%] left-[4%] z-10 w-[92%] sm:bottom-[8%] sm:w-[56%]">
           <div className="legible">
             <h1 className="font-head text-[clamp(1.9rem,6vw,2.7rem)] font-semibold leading-[1.04] tracking-[-0.025em] text-white sm:text-[clamp(2rem,4.6vw,4rem)]">
               Light Up Every
@@ -132,7 +219,7 @@ export default function LandingPage() {
         </aside>
 
         {/* Bottom rignt corner */}
-        <aside className="intro-element absolute right-[4%] top-[42%] z-20 w-[176px] rounded-[14px] border border-white/25 bg-white/15 p-5 backdrop-blur-md sm:bottom-[16%] sm:top-auto sm:w-[224px] sm:p-6">
+        <aside className="intro-element absolute right-[4%] top-[42%] z-20 hidden w-[176px] rounded-[14px] border border-white/25 bg-white/15 p-5 backdrop-blur-md sm:bottom-[16%] sm:top-auto sm:block sm:w-[224px] sm:p-6">
           <p className="text-[30px] font-semibold leading-none tracking-tight text-white legible lg:text-[40px]">100+</p>
           <p className="mt-3 text-[10px] leading-[1.55] text-white/90 legible lg:text-[12px]">
             Celebrations lit up across Sri Lanka with safe, spectacular fireworks.

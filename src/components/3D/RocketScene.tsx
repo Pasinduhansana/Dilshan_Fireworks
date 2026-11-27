@@ -131,7 +131,7 @@ export default function RocketScene() {
       <Canvas
         camera={{ position: [0, 0, 6], fov: 40 }}
         gl={{ antialias: true, alpha: true }}
-        dpr={[1, 1.75]}
+        dpr={[1, 1.5]}
       >
         <ambientLight intensity={1.2} />
         <directionalLight position={[4, 5, 6]} intensity={2} />
