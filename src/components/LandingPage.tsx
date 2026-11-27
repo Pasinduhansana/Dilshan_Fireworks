@@ -43,6 +43,15 @@ export default function LandingPage() {
         />
         <div className="hero-scrim pointer-events-none absolute inset-0" />
 
+        <Image
+          src="/images/logo.png"
+          alt="Dilshan Fireworks"
+          width={500}
+          height={500}
+          priority
+          className="intro-element absolute left-[3%] top-[10%] z-20 h-auto w-[86px] sm:left-[4%] sm:top-[4%] sm:w-[150px]"
+        />
+
         <nav
           aria-label="Primary"
           className="intro-element absolute right-[2%] top-[4%] z-20 flex items-center gap-0.5 rounded-full border border-white/70 bg-[#f7f8f4]/95 p-[5px] shadow-[0_10px_32px_rgba(6,28,34,0.3)] backdrop-blur-sm sm:gap-1 sm:p-[7px]"

@@ -21,6 +21,7 @@ src/
     Event.tsx             Events section (client component, own content reveals)
 public/images/
     hero.jpg              Landing hero background (do not change)
+    logo.png              Dilshan Fireworks logo, shown top-left on landing page
     fw-30048038.jpg       Supplied fireworks image (unused by current Events layout)
     fw-32974947.jpg       Supplied fireworks image (unused by current Events layout)
     fw-33689354.jpg       Supplied fireworks image (unused by current Events layout)
@@ -30,7 +31,7 @@ PROJECT_GUIDE.md      This file — update when implementation changes
 
 ## Component responsibilities
 
-- `LandingPage.tsx`: exact, verbatim copy of the approved landing page. Do not restyle, reposition, reorder, or remove anything here. The navbar is `<nav class="intro-element ...">` and must keep its existing markup and styling.
+- `LandingPage.tsx`: the approved landing page. Only exception: a top-left logo `<Image src="/images/logo.png">` was added at the user's request; everything else must stay unchanged. The navbar is `<nav class="intro-element ...">` and must keep its existing markup and styling.
 - `CinematicIntro.tsx`: pre-existing intro timeline (hero scale + `.intro-element` fade/blur/slide). Untouched. Still owns initial page-load motion.
 - `Event.tsx`: independent Events section with **no solid section background**. All content sits inside one full-width translucent frosted-glass panel (`rgba(7,26,32,0.28)` + `backdrop-blur(22px)`), so the landing hero shows through blurred while Events slides over it. Compact asymmetric 12-column mosaic of six categories (Weddings, Musical Shows, Cricket Matches, Birthday Parties, Corporate Events, Festivals) using local images in `public/images/events/`. Owns its own GSAP ScrollTrigger reveals, image parallax, and hover interactions.
 - `CinematicJourney.tsx`: owns the single scroll-driven transition timeline, the `a[href="#events"]` / `a[href="#home"]` click handlers, the persistent white frame layer, and keeps the existing navbar fixed at the top of all layers (`z-index: 9999`). Layer order: Events `z-30` < white frame `z-50` < navbar `z-9999`. Both scrolling and clicking drive the same timeline via the same scroll position — no second transition timeline. `#home` must be scrolled programmatically because its target is pinned.
@@ -62,7 +63,7 @@ PROJECT_GUIDE.md      This file — update when implementation changes
 
 ## Important restrictions
 
-1. Landing markup in `LandingPage.tsx`, its CSS in `globals.css`, and `CinematicIntro.tsx` are approved — do not modify them.
+ 1. Landing markup in `LandingPage.tsx`, its CSS in `globals.css`, and `CinematicIntro.tsx` are approved — do not modify them, apart from the explicitly requested top-left logo.
 2. Never animate the landing hero image or its wrapper during the Events transition.
 3. Never animate the navbar as part of the transition. It must stay visually fixed on top while Events overlaps; do not restyle it.
 4. Events content reveals must be blur/opacity only (no `y` translation), and the Events section must not get a solid background — only the glass panel.
