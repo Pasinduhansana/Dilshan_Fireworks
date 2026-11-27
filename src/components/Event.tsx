@@ -167,10 +167,10 @@ export default function Event() {
 
   return (
     <section id="events" ref={root} aria-labelledby="events-title" className="relative text-white">
-      <div className="relative w-full py-2 sm:py-8">
-        <div className="w-full border-y border-white/15 bg-[rgba(7,26,32,0.28)] px-6 py-8 shadow-[0_30px_90px_rgba(0,0,0,0.35)] backdrop-blur-[22px] sm:px-10 sm:py-16 lg:px-16 2xl:px-24 2xl:py-20">
+      <div className="relative w-full py-2 sm:py-6 lg:py-4">
+        <div className="w-full border-y border-white/15 bg-[rgba(7,26,32,0.28)] px-6 py-8 shadow-[0_30px_90px_rgba(0,0,0,0.35)] backdrop-blur-[22px] sm:px-10 sm:py-12 lg:px-16 lg:py-10 2xl:px-24 2xl:py-14">
           <div className="mx-auto w-full max-w-[1360px] 2xl:max-w-[1680px]">
-            <header className="event-chapter flex flex-col justify-center pb-8 pt-10 sm:min-h-[52vh] sm:pb-12 sm:pt-16 lg:min-h-[62vh] lg:pb-16 lg:pt-20 2xl:min-h-[58vh] 2xl:pb-24 2xl:pt-24">
+            <header className="event-chapter flex flex-col justify-center pb-8 pt-10 sm:min-h-[52vh] sm:pb-12 sm:pt-16 lg:min-h-[50vh] lg:pb-10 lg:pt-12 2xl:min-h-[52vh] 2xl:pb-16 2xl:pt-16">
               <div className="event-chapter__reveal flex items-center gap-4">
                 <span className="h-px w-12 bg-[#df914c] 2xl:w-16" />
                 <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/60 2xl:text-[11px]">Events &amp; displays</span>
@@ -216,7 +216,7 @@ export default function Event() {
             </div>
 
             {/* Every Celebration - Content Points */}
-            <footer className="event-chapter flex flex-col justify-center gap-6 py-10 lg:flex-row lg:items-end lg:justify-between lg:py-20 lg:pt-32 2xl:py-24 2xl:pt-40">
+            <footer className="event-chapter flex flex-col justify-center gap-6 py-10 lg:flex-row lg:items-end lg:justify-between lg:py-12 lg:pt-16 2xl:py-16 2xl:pt-20">
               <p className="event-chapter__reveal max-w-[20ch] font-head text-[clamp(1.9rem,5vw,3.8rem)] font-semibold leading-[1.04] tracking-[-0.04em] 2xl:text-[4.5rem]">
                 Every celebration deserves its own sky.
               </p>
