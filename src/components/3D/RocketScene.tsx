@@ -120,17 +120,7 @@ function RocketModel() {
         <meshStandardMaterial color="#d7a348" metalness={0.8} roughness={0.25} />
       </mesh>
 
-      <mesh position={[0, -1.38, 0]}>
-        <cylinderGeometry args={[0.24, 0.34, 0.4, 32]} />
-        <meshPhysicalMaterial color="#34343a" metalness={0.85} roughness={0.28} />
-      </mesh>
-
-      <mesh position={[0, -1.59, 0]}>
-        <cylinderGeometry args={[0.25, 0.25, 0.07, 32]} />
-        <meshStandardMaterial color="#b78b45" metalness={0.85} roughness={0.2} />
-      </mesh>
-
-      <ExhaustEffect position={[0, -1.62, 0]} scale={1} />
+      <ExhaustEffect position={[0, -1.24, 0]} scale={1} />
     </group>
   );
 }

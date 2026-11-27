@@ -28,6 +28,7 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
       (element) => element.tagName !== "NAV",
     );
     const rocketFlight = landingShell.querySelector<HTMLElement>("[data-rocket-flight]");
+    const rocketFloat = rocketFlight?.querySelector<HTMLElement>("[data-rocket-float]") ?? null;
     const rocketParent = rocketFlight?.parentElement ?? null;
     const rocketNextSibling = rocketFlight?.nextSibling ?? null;
     if (rocketFlight) journey.appendChild(rocketFlight);
@@ -131,81 +132,142 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
     const handleResize = () => {
       pinNavbar();
       placeIndicator(activeLink, false);
-      placeRocket();
     };
     window.addEventListener("resize", handleResize);
 
     let rocketCleanup: (() => void) | null = null;
-    const placeRocket = () => {
-      if (!rocketFlight || !innerSection) return;
-      const rect = innerSection.getBoundingClientRect();
-      const isLg = window.innerWidth >= 1024;
-      const isSm = window.innerWidth >= 640;
-      const width = rect.width * (isLg ? 0.38 : isSm ? 0.52 : 0.72);
-      const height = rect.height * (isLg ? 0.68 : isSm ? 0.6 : 0.46);
-      Object.assign(rocketFlight.style, {
-        position: "fixed",
-        left: `${rect.left + rect.width / 2 - width / 2}px`,
-        top: `${rect.top + rect.height * (isLg ? 0.1 : isSm ? 0.12 : 0.14)}px`,
-        width: `${width}px`,
-        height: `${height}px`,
-        zIndex: "45",
-        pointerEvents: "none",
-        transform: "none",
-      });
-    };
-
     if (rocketFlight) {
-      placeRocket();
-      gsap.set(rocketFlight, { transformOrigin: "50% 50%", zIndex: 45 });
-      if (reduced) {
-        gsap.set(rocketFlight, { xPercent: 0, yPercent: 0, scale: 1, rotation: 0, opacity: 1 });
-      } else {
-        let flight: gsap.core.Timeline | null = null;
-        const intro = gsap.fromTo(
-          rocketFlight,
-          { yPercent: 115, xPercent: 0, scale: 0.88, rotation: -6, opacity: 0.96 },
-          {
-            yPercent: 0,
-            xPercent: 0,
-            scale: 1,
-            rotation: 0,
-            opacity: 1,
-            duration: 2.2,
-            ease: "power3.out",
-            delay: 0.2,
-            onComplete: () => {
-              flight = gsap.timeline({
-                defaults: { ease: "none" },
-                scrollTrigger: {
-                  trigger: journey,
-                  start: "top top",
-                  endTrigger: eventShell,
-                  end: "bottom bottom",
-                  scrub: 1.15,
-                  invalidateOnRefresh: true,
-                  onRefresh: placeRocket,
-                },
-              });
+      const initial = (() => {
+        if (!innerSection) return null;
+        const rect = innerSection.getBoundingClientRect();
+        const vw = window.innerWidth;
+        const isLg = vw >= 1024;
+        const isSm = vw >= 640;
+        const width = rect.width * (isLg ? 0.38 : isSm ? 0.52 : 0.72);
+        const height = rect.height * (isLg ? 0.68 : isSm ? 0.6 : 0.46);
+        const startLeft = rect.left + rect.width / 2 - width / 2;
+        const startTop = rect.top + rect.height * (isLg ? 0.1 : isSm ? 0.12 : 0.14);
+        const dockScale = isLg ? 0.34 : isSm ? 0.4 : 0.46;
+        const dockLeft = startLeft;
+        const dockTop = -height * dockScale - 80;
+        Object.assign(rocketFlight.style, {
+          position: "fixed",
+          left: `${startLeft}px`,
+          top: `${startTop}px`,
+          width: `${width}px`,
+          height: `${height}px`,
+          zIndex: "45",
+          pointerEvents: "none",
+          transform: "none",
+        });
+        return { startLeft, startTop, width, height, dockLeft, dockTop, dockScale };
+      })();
 
-              flight
-                .to(rocketFlight, { xPercent: 6, yPercent: -18, scale: 0.92, rotation: 35, duration: 0.22 })
-                .to(rocketFlight, { xPercent: 18, yPercent: -8, scale: 0.82, rotation: 110, duration: 0.2 })
-                .to(rocketFlight, { xPercent: 28, yPercent: 18, scale: 0.72, rotation: 180, duration: 0.2 })
-                .to(rocketFlight, { xPercent: 34, yPercent: 70, scale: 0.58, rotation: 180, duration: 0.2 })
-                .to(rocketFlight, { xPercent: 36, yPercent: 170, scale: 0.44, rotation: 185, duration: 0.18 });
+      if (initial) {
+        gsap.set(rocketFlight, { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, transformOrigin: "50% 50%", force3D: true });
+        if (rocketFloat) gsap.set(rocketFloat, { rotationX: 8, rotationY: 0, y: 0, transformOrigin: "50% 50%", force3D: true });
+
+        if (!reduced) {
+          const travel = { p: 0 };
+          const state = { p: 0 };
+          let dockX = initial.dockLeft - initial.startLeft;
+          let dockY = initial.dockTop - initial.startTop;
+          let dockScale = initial.dockScale;
+          let flightActive = false;
+
+          const floatSpin = rocketFloat
+            ? gsap.to(rocketFloat, { rotationY: 360, duration: 16, ease: "none", repeat: -1 })
+            : null;
+          const floatBob = rocketFloat
+            ? gsap.to(rocketFloat, { y: -7, duration: 2.8, ease: "sine.inOut", yoyo: true, repeat: -1 })
+            : null;
+
+          const applyRocket = (p: number) => {
+            const x = gsap.utils.interpolate(0, dockX, p);
+            const y = gsap.utils.interpolate(0, dockY, p);
+            const scale = gsap.utils.interpolate(1, dockScale, p);
+            const rotation = gsap.utils.interpolate(0, 10, p);
+            const opacity = p < 0.72 ? 1 : gsap.utils.interpolate(1, 0, (p - 0.72) / 0.28);
+            gsap.set(rocketFlight, { x, y, scale, rotation, opacity, overwrite: "auto" });
+          };
+
+          const tick = () => {
+            if (!flightActive) return;
+            state.p += (travel.p - state.p) * 0.12;
+            if (Math.abs(travel.p - state.p) < 0.0005) state.p = travel.p;
+            applyRocket(state.p);
+          };
+          gsap.ticker.add(tick);
+
+          const intro = gsap.fromTo(
+            rocketFlight,
+            { y: window.innerHeight * 0.75, x: 0, scale: 0.88, rotation: -6, opacity: 0.96 },
+            {
+              y: 0, x: 0, scale: 1, rotation: 0, opacity: 1,
+              duration: 2.2, ease: "power3.out", delay: 0.2, overwrite: "auto",
+              onComplete: () => {
+                gsap.set(rocketFlight, { x: 0, y: 0, scale: 1, rotation: 0 });
+                state.p = travel.p;
+                applyRocket(state.p);
+                flightActive = true;
+              },
             },
-          },
-        );
+          );
 
-        rocketCleanup = () => {
-          intro.kill();
-          flight?.scrollTrigger?.kill();
-          flight?.kill();
-          gsap.set(rocketFlight, { clearProps: "transform,opacity,zIndex" });
-          rocketFlight.style.cssText = "";
-          if (rocketParent) rocketParent.insertBefore(rocketFlight, rocketNextSibling);
-        };
+          const flight = gsap.to(travel, {
+            p: 1,
+            ease: "none",
+            paused: true,
+            scrollTrigger: {
+              trigger: journey,
+              start: "top top",
+              endTrigger: eventShell,
+              end: "bottom bottom",
+              scrub: true,
+              invalidateOnRefresh: true,
+              onRefresh: () => {
+                if (!innerSection) return;
+                const rect = innerSection.getBoundingClientRect();
+                const vw = window.innerWidth;
+                const isLg = vw >= 1024;
+                const isSm = vw >= 640;
+                const width = rect.width * (isLg ? 0.38 : isSm ? 0.52 : 0.72);
+                const height = rect.height * (isLg ? 0.68 : isSm ? 0.6 : 0.46);
+                const startLeft = rect.left + rect.width / 2 - width / 2;
+                const startTop = rect.top + rect.height * (isLg ? 0.1 : isSm ? 0.12 : 0.14);
+                dockScale = isLg ? 0.34 : isSm ? 0.4 : 0.46;
+                const dockLeft = startLeft;
+                const dockTop = -height * dockScale - 80;
+                dockX = dockLeft - startLeft;
+                dockY = dockTop - startTop;
+                rocketFlight.style.left = `${startLeft}px`;
+                rocketFlight.style.top = `${startTop}px`;
+                rocketFlight.style.width = `${width}px`;
+                rocketFlight.style.height = `${height}px`;
+              },
+            },
+          });
+
+          rocketCleanup = () => {
+            intro.kill();
+            flight.scrollTrigger?.kill();
+            flight.kill();
+            floatSpin?.kill();
+            floatBob?.kill();
+            gsap.ticker.remove(tick);
+            if (rocketFloat) gsap.set(rocketFloat, { clearProps: "transform" });
+            gsap.set(rocketFlight, { clearProps: "transform,opacity,zIndex" });
+            rocketFlight.style.cssText = "";
+            if (rocketParent) rocketParent.insertBefore(rocketFlight, rocketNextSibling);
+          };
+        } else {
+          rocketCleanup = () => {
+            if (rocketFloat) gsap.set(rocketFloat, { clearProps: "transform" });
+            gsap.set(rocketFlight, { clearProps: "transform,opacity,zIndex" });
+            rocketFlight.style.cssText = "";
+            if (rocketParent) rocketParent.insertBefore(rocketFlight, rocketNextSibling);
+          };
+        }
       }
     }
 

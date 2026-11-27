@@ -75,14 +75,15 @@ const fragmentShader = /* glsl */ `
     alpha *= smoothstep(1.1, 0.6, r);
     alpha *= vAlpha;
 
-    // Soft dark smoke with slight warm tint near core age
-    vec3 dark = vec3(0.18, 0.18, 0.2);
-    vec3 mid = vec3(0.35, 0.34, 0.36);
-    float shade = smoothstep(0.2, 0.8, n);
+    vec3 dark = vec3(0.14, 0.14, 0.16);
+    vec3 mid = vec3(0.32, 0.31, 0.33);
+    vec3 warm = vec3(0.42, 0.32, 0.26);
+    float shade = smoothstep(0.2, 0.85, n);
     vec3 color = mix(dark, mid, shade);
+    color = mix(color, warm, smoothstep(0.55, 0.0, vAlpha) * 0.15);
 
     if (alpha < 0.01) discard;
-    gl_FragColor = vec4(color, alpha * 0.55);
+    gl_FragColor = vec4(color, alpha * 0.5);
   }
 `;
 
@@ -100,14 +101,14 @@ type SmokeParticle = {
 
 function spawn(p: SmokeParticle, initial = false) {
   p.life = initial ? Math.random() * p.maxLife : 0;
-  p.pos.set((Math.random() - 0.5) * 0.18, -0.2 - Math.random() * 0.3, (Math.random() - 0.5) * 0.18);
-  p.vel.set((Math.random() - 0.5) * 0.25, -0.35 - Math.random() * 0.55, (Math.random() - 0.5) * 0.25);
-  p.maxLife = 1.8 + Math.random() * 1.8;
-  p.scale = 0.35 + Math.random() * 0.45;
+  p.pos.set((Math.random() - 0.5) * 0.16, -0.15 - Math.random() * 0.35, (Math.random() - 0.5) * 0.16);
+  p.vel.set((Math.random() - 0.5) * 0.18, -0.3 - Math.random() * 0.5, (Math.random() - 0.5) * 0.18);
+  p.maxLife = 2.0 + Math.random() * 2.2;
+  p.scale = 0.28 + Math.random() * 0.4;
   p.rotation = Math.random() * Math.PI * 2;
-  p.rotSpeed = (Math.random() - 0.5) * 0.8;
+  p.rotSpeed = (Math.random() - 0.5) * 0.6;
   p.seed = Math.random();
-  p.baseAlpha = 0.35 + Math.random() * 0.35;
+  p.baseAlpha = 0.28 + Math.random() * 0.32;
 }
 
 export default function SmokeParticles() {
@@ -167,9 +168,9 @@ export default function SmokeParticles() {
       p.pos.addScaledVector(p.vel, delta);
       p.rotation += p.rotSpeed * delta;
 
-      const expand = p.scale + t * 1.8;
-      const fadeIn = smoothstep(0, 0.15, t);
-      const fadeOut = 1 - smoothstep(0.45, 1, t);
+      const expand = p.scale + t * 2.2;
+      const fadeIn = smoothstep(0, 0.12, t);
+      const fadeOut = 1 - smoothstep(0.4, 1, t);
 
       posAttr.array[i * 3] = p.pos.x;
       posAttr.array[i * 3 + 1] = p.pos.y;

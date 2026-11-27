@@ -53,40 +53,42 @@ const fragmentShader = /* glsl */ `
 
     float n1 = fbm(nUv + vec2(t * 0.4, 0.0));
     float n2 = fbm(nUv * 1.7 - vec2(0.0, t * 1.6));
-    float turb = (n1 - 0.5) * 0.55 + (n2 - 0.5) * 0.25;
+    float n3 = fbm(nUv * 3.1 + vec2(t * 1.2, -t * 2.4));
+    float turb = (n1 - 0.5) * 0.6 + (n2 - 0.5) * 0.28 + (n3 - 0.5) * 0.12;
 
     float radius = length(vPos.xz);
-    float maxR = mix(0.42, 0.04, pow(y, 0.85)) * (0.85 + n1 * 0.35 + turb * 0.12);
-    float shape = 1.0 - smoothstep(maxR * 0.55, maxR, radius);
+    float maxR = mix(0.46, 0.03, pow(y, 0.9)) * (0.82 + n1 * 0.4 + turb * 0.16);
+    float shape = 1.0 - smoothstep(maxR * 0.45, maxR, radius);
 
-    shape *= smoothstep(1.0, 0.55, y);
-    shape *= smoothstep(0.0, 0.08, y);
+    shape *= smoothstep(1.0, 0.5, y);
+    shape *= smoothstep(0.0, 0.06, y);
 
-    float erosion = fbm(vec2(angle * 2.0 + t * 2.0, y * 5.0 - t * 5.5));
-    shape *= smoothstep(0.18, 0.52, erosion + (1.0 - y) * 0.25);
+    float erosion = fbm(vec2(angle * 2.4 + t * 2.8, y * 6.0 - t * 6.5));
+    shape *= smoothstep(0.12, 0.58, erosion + (1.0 - y) * 0.3);
 
-    float core = exp(-pow(radius / max(maxR * 0.35, 0.001), 2.0));
-    core *= smoothstep(0.7, 0.0, y);
+    float core = exp(-pow(radius / max(maxR * 0.28, 0.001), 2.0));
+    core *= smoothstep(0.55, 0.0, y);
+    float throat = exp(-pow(radius / 0.07, 2.0)) * smoothstep(0.22, 0.0, y);
 
-    float intensity = shape * (0.7 + n1 * 0.5) + core * 0.9;
+    float intensity = shape * (0.75 + n1 * 0.55) + core * 1.1 + throat * 0.8;
 
-    vec3 darkOrange = vec3(0.9, 0.18, 0.02);
-    vec3 orange = vec3(1.0, 0.42, 0.05);
-    vec3 yellow = vec3(1.0, 0.78, 0.15);
-    vec3 white = vec3(1.0, 0.97, 0.88);
+    vec3 red = vec3(0.85, 0.12, 0.01);
+    vec3 orange = vec3(1.0, 0.38, 0.04);
+    vec3 yellow = vec3(1.0, 0.76, 0.12);
+    vec3 white = vec3(1.0, 0.98, 0.92);
 
-    vec3 color = mix(darkOrange, orange, smoothstep(0.05, 0.45, intensity));
-    color = mix(color, yellow, smoothstep(0.35, 0.75, intensity));
-    color = mix(color, white, smoothstep(0.65, 1.15, core + intensity * 0.35));
+    vec3 color = mix(red, orange, smoothstep(0.03, 0.4, intensity));
+    color = mix(color, yellow, smoothstep(0.3, 0.72, intensity));
+    color = mix(color, white, smoothstep(0.62, 1.2, core + throat + intensity * 0.28));
 
-    float flicker = 0.92 + sin(t * 28.0 + y * 10.0) * 0.06 + sin(t * 19.0) * 0.04;
+    float flicker = 0.9 + sin(t * 32.0 + y * 14.0) * 0.07 + sin(t * 21.0) * 0.05;
     color *= flicker;
 
-    float alpha = clamp(shape * (0.55 + core * 0.7), 0.0, 1.0);
-    alpha *= smoothstep(1.0, 0.75, y);
+    float alpha = clamp(shape * (0.6 + core * 0.75) + throat * 0.25, 0.0, 1.0);
+    alpha *= smoothstep(1.0, 0.72, y);
 
     if (alpha < 0.01) discard;
-    gl_FragColor = vec4(color * (1.2 + core * 1.8), alpha);
+    gl_FragColor = vec4(color * (1.35 + core * 2.1 + throat * 1.2), alpha);
   }
 `;
 
@@ -114,8 +116,8 @@ export default function FlameShader() {
 
   return (
     <group>
-      <mesh ref={outerRef} position={[0, -0.95, 0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[0.42, 2.1, 48, 24, true]} />
+      <mesh ref={outerRef} position={[0, -1.05, 0]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.46, 2.35, 48, 28, true]} />
         <shaderMaterial
           uniforms={uniforms}
           vertexShader={vertexShader}
@@ -127,8 +129,8 @@ export default function FlameShader() {
           toneMapped={false}
         />
       </mesh>
-      <mesh ref={innerRef} position={[0, -0.7, 0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[0.22, 1.5, 32, 16, true]} />
+      <mesh ref={innerRef} position={[0, -0.78, 0]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.24, 1.7, 32, 20, true]} />
         <shaderMaterial
           uniforms={innerUniforms}
           vertexShader={vertexShader}
@@ -140,7 +142,12 @@ export default function FlameShader() {
           toneMapped={false}
         />
       </mesh>
-      <pointLight position={[0, -0.9, 0]} color="#ff7a1a" intensity={14} distance={6} decay={2} />
+      <mesh position={[0, -0.15, 0]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.1, 0.55, 24, 12, true]} />
+        <meshBasicMaterial color="#fff6d5" transparent opacity={0.55} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+      </mesh>
+      <pointLight position={[0, -0.2, 0]} color="#fff0c2" intensity={8} distance={2.2} decay={2} />
+      <pointLight position={[0, -1.0, 0]} color="#ff6a14" intensity={18} distance={6.5} decay={2} />
     </group>
   );
 }
