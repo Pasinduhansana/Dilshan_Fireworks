@@ -76,8 +76,20 @@ const surfaceFragment = /* glsl */ `
     float rim = exp(-abs(edge) * 28.0) * smoothstep(0.015, 0.18, uBurn);
     rim *= 0.75 + 0.25 * sin(uTime * 16.0 + vUv.y * 40.0);
 
-    vec3 dark = mix(vec3(0.045, 0.125, 0.15), vec3(0.018, 0.07, 0.09), vUv.y);
-    dark += (coarse - 0.5) * 0.03;
+    vec3 dark = mix(vec3(0.036, 0.108, 0.132), vec3(0.012, 0.05, 0.064), vUv.y);
+
+    float sweep = vUv.x * 0.72 + vUv.y * 0.38;
+    float sheen = smoothstep(0.05, 0.42, sweep) * (1.0 - smoothstep(0.58, 1.02, sweep));
+    dark += sheen * vec3(0.028, 0.052, 0.06);
+
+    float vignette = 1.0 - smoothstep(0.24, 0.78, distance(vUv, vec2(0.5)));
+    dark *= 0.8 + vignette * 0.24;
+    dark += pow(1.0 - vUv.y, 3.0) * vec3(0.018, 0.036, 0.042);
+    dark += exp(-abs(vUv.x - 0.86) * 7.0) * vec3(0.02, 0.011, 0.004);
+
+    float grain = (hash(floor(vUv * uResolution * 0.32)) - 0.5) * 0.018;
+    dark += grain;
+    dark += (coarse - 0.5) * 0.022;
 
     vec3 fire = mix(vec3(1.0, 0.32, 0.05), vec3(1.0, 0.86, 0.35), smoothstep(0.0, 0.035, edge));
     vec3 color = dark + fire * rim * 1.7;

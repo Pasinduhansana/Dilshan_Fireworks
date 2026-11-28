@@ -76,6 +76,19 @@ function PackageOrnament() {
   );
 }
 
+function ExploreAction() {
+  return (
+    <span className="group/explore inline-flex items-center gap-2.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-[#df914c]">
+      <span>Explore</span>
+      <span className="relative block h-3 w-3">
+        <span className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-current opacity-70 transition-transform duration-500 ease-out group-hover/explore:scale-y-150" />
+        <span className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-current opacity-70 transition-transform duration-500 ease-out group-hover/explore:scale-x-150" />
+        <span className="absolute left-1/2 top-1/2 h-[3px] w-[3px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-current transition-transform duration-500 ease-out group-hover/explore:scale-[2.4]" />
+      </span>
+    </span>
+  );
+}
+
 export default function Packages() {
   const root = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -521,7 +534,7 @@ export default function Packages() {
                   onFocus={() => setHoverIndex(i)}
                   onBlur={() => setHoverIndex(null)}
                   aria-label={`View ${pkg.title}`}
-                  className="group relative overflow-hidden rounded-[20px] border border-white/10 bg-[rgba(10,30,36,0.42)] p-6 text-left backdrop-blur-[20px] transition-[border-color,background-color,box-shadow,transform] duration-500 hover:-translate-y-1 hover:border-[#df914c]/45 hover:bg-[rgba(18,42,48,0.6)] hover:shadow-[0_30px_80px_rgba(0,0,0,0.4),0_0_60px_rgba(223,145,76,0.1)] sm:p-7"
+                  className="group relative overflow-hidden rounded-[22px] bg-[rgba(8,26,32,0.56)] p-6 text-left backdrop-blur-[20px] transition-transform duration-500 ease-out hover:-translate-y-1 sm:p-7"
                 >
                   <Image
                     src={pkg.image}
@@ -532,13 +545,17 @@ export default function Packages() {
                   />
                   <PackageFireworkReveal active={hoverIndex === i} seed={i + 1} />
                   <PackageOrnament />
-                  <div className="pointer-events-none absolute inset-0 z-[2] bg-[linear-gradient(140deg,rgba(255,255,255,0.09),transparent_42%,transparent_68%,rgba(223,145,76,0.09))] opacity-80" />
-                  <div className="relative z-[3] flex min-h-[280px] flex-col sm:min-h-[320px]">
-                    <h3 className="max-w-[16ch] font-head text-[clamp(1.7rem,2.6vw,2.4rem)] font-semibold leading-[1.06] tracking-[-0.04em]">{pkg.title}</h3>
-                    <p className="mt-4 max-w-[30ch] text-[13px] leading-relaxed text-white/55 sm:text-[14px]">{pkg.subtitle}</p>
-                    <div className="mt-auto flex items-center gap-3 pt-10 text-[10px] font-medium uppercase tracking-[0.2em] text-[#df914c]/85">
-                      <span>Explore</span>
-                      <span className="h-px w-6 bg-[#df914c]/70 transition-all duration-500 group-hover:w-10" />
+                  <div className="pointer-events-none absolute inset-0 z-[2] bg-[linear-gradient(155deg,rgba(255,255,255,0.06),transparent_38%,transparent_66%,rgba(223,145,76,0.06))]" />
+                  <div className="pointer-events-none absolute inset-0 z-[2] ring-1 ring-inset ring-white/[0.07]" />
+                  <div className="relative z-[3] flex min-h-[290px] flex-col sm:min-h-[330px]">
+                    <div className="flex items-start justify-between gap-4 pr-16">
+                      <span className="text-[9px] font-medium uppercase tracking-[0.32em] text-white/35">Dilshan</span>
+                      <span className="mt-1 h-px w-9 bg-[#df914c]/70" />
+                    </div>
+                    <h3 className="mt-auto max-w-[15ch] font-head text-[clamp(1.85rem,2.8vw,2.55rem)] font-semibold leading-[1.02] tracking-[-0.045em] text-white/95">{pkg.title}</h3>
+                    <p className="mt-4 max-w-[30ch] text-[13px] leading-[1.75] text-white/58 sm:text-[14px]">{pkg.subtitle}</p>
+                    <div className="pt-10">
+                      <ExploreAction />
                     </div>
                   </div>
                 </button>
