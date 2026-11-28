@@ -1,8 +1,14 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import PackageFireworkReveal from "@/components/PackageFireworkReveal";
+import birthdayImage from "../../public/images/events/birthday.jpg";
+import festivalImage from "../../public/images/events/festival.jpg";
+import musicImage from "../../public/images/events/music.jpg";
+import weddingImage from "../../public/images/events/wedding.jpg";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,6 +18,7 @@ type PackageItem = {
   subtitle: string;
   description: string;
   includes: string[];
+  image: typeof weddingImage;
 };
 
 const PACKAGES: PackageItem[] = [
@@ -22,6 +29,7 @@ const PACKAGES: PackageItem[] = [
     description:
       "An elegant fireworks composition designed to frame your ceremony with warmth, brilliance, and cinematic timing.",
     includes: ["Ceremony entrance sparkle sequence", "Couple spotlight aerial display", "Grand finale synchronized burst", "On-site safety and coordination"],
+    image: weddingImage,
   },
   {
     id: "birthday",
@@ -30,6 +38,7 @@ const PACKAGES: PackageItem[] = [
     description:
       "A joyful, high-energy display crafted to elevate birthdays with color, rhythm, and a memorable closing moment.",
     includes: ["Celebration opener fountains", "Color-themed aerial shells", "Cake moment sparkle accent", "Controlled setup and cleanup"],
+    image: birthdayImage,
   },
   {
     id: "musical",
@@ -38,6 +47,7 @@ const PACKAGES: PackageItem[] = [
     description:
       "A rhythm-driven fireworks display choreographed to the music, turning every beat into a moment of light above the crowd.",
     includes: ["Beat-synced launch sequence", "Stage-safe low-smoke effects", "Colour-matched finale", "Sound and show coordination"],
+    image: musicImage,
   },
   {
     id: "custom",
@@ -46,6 +56,7 @@ const PACKAGES: PackageItem[] = [
     description:
       "A bespoke fireworks experience tailored to your venue, audience, and atmosphere, from intimate gatherings to large-scale events.",
     includes: ["Concept and display planning", "Venue-aware choreography", "Custom colour and intensity palette", "Dedicated event consultation"],
+    image: festivalImage,
   },
 ];
 
@@ -54,7 +65,7 @@ type Offset = { dx: number; dy: number };
 
 function PackageOrnament() {
   return (
-    <div className="pkg-3d pointer-events-none absolute right-5 top-5 h-16 w-16 sm:h-20 sm:w-20">
+    <div className="pkg-3d pointer-events-none absolute right-5 top-5 z-[3] h-16 w-16 sm:h-20 sm:w-20">
       <div className="pkg-3d__core">
         <span className="pkg-3d__ring pkg-3d__ring--a" />
         <span className="pkg-3d__ring pkg-3d__ring--b" />
@@ -76,6 +87,7 @@ export default function Packages() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [boxOpen, setBoxOpen] = useState(false);
   const [faceHalf, setFaceHalf] = useState(160);
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [shownPkg, setShownPkg] = useState<PackageItem | null>(null);
 
@@ -457,13 +469,33 @@ export default function Packages() {
                   data-pkg-id={pkg.id}
                   type="button"
                   onClick={() => goTo(i)}
+                  onPointerEnter={(e) => {
+                    if (e.pointerType === "mouse" || e.pointerType === "pen") setHoverIndex(i);
+                  }}
+                  onPointerLeave={(e) => {
+                    if (e.pointerType === "mouse" || e.pointerType === "pen") setHoverIndex(null);
+                  }}
+                  onTouchStart={() => setHoverIndex(i)}
+                  onFocus={() => setHoverIndex(i)}
+                  onBlur={() => setHoverIndex(null)}
                   aria-label={`Rotate to ${pkg.title}`}
                   style={faceStyle(i * 90)}
                   className="absolute left-0 top-0 flex flex-col overflow-hidden rounded-[18px] border border-white/12 bg-[rgba(12,34,40,0.78)] p-6 text-left shadow-[0_20px_60px_rgba(0,0,0,0.45)] backdrop-blur-[24px] [backface-visibility:hidden] [transform-style:preserve-3d]"
                 >
+                  <Image
+                    src={pkg.image}
+                    alt=""
+                    fill
+                    sizes="40vw"
+                    className="object-cover"
+                  />
+                  <PackageFireworkReveal
+                    active={hoverIndex === i || (hoverIndex === null && activeIndex === i)}
+                    seed={i + 1}
+                  />
                   <PackageOrnament />
-                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(140deg,rgba(255,255,255,0.1),transparent_45%,transparent_70%,rgba(223,145,76,0.08))]" />
-                  <div className="relative flex h-full flex-col">
+                  <div className="pointer-events-none absolute inset-0 z-[2] bg-[linear-gradient(140deg,rgba(255,255,255,0.1),transparent_45%,transparent_70%,rgba(223,145,76,0.08))]" />
+                  <div className="relative z-[3] flex h-full flex-col">
                     <span className="font-head text-[clamp(1rem,2vw,1.5rem)] font-semibold tracking-[-0.03em]">{pkg.title}</span>
                     <span className="mt-auto max-w-[24ch] text-[12px] leading-relaxed text-white/60 sm:text-[14px]">{pkg.subtitle}</span>
                   </div>
@@ -479,12 +511,29 @@ export default function Packages() {
                   data-pkg-id={pkg.id}
                   type="button"
                   onClick={() => requestOpen(i)}
+                  onPointerEnter={(e) => {
+                    if (e.pointerType === "mouse" || e.pointerType === "pen") setHoverIndex(i);
+                  }}
+                  onPointerLeave={(e) => {
+                    if (e.pointerType === "mouse" || e.pointerType === "pen") setHoverIndex(null);
+                  }}
+                  onTouchStart={() => setHoverIndex(i)}
+                  onFocus={() => setHoverIndex(i)}
+                  onBlur={() => setHoverIndex(null)}
                   aria-label={`View ${pkg.title}`}
                   className="group relative overflow-hidden rounded-[20px] border border-white/10 bg-[rgba(10,30,36,0.42)] p-6 text-left backdrop-blur-[20px] transition-[border-color,background-color,box-shadow,transform] duration-500 hover:-translate-y-1 hover:border-[#df914c]/45 hover:bg-[rgba(18,42,48,0.6)] hover:shadow-[0_30px_80px_rgba(0,0,0,0.4),0_0_60px_rgba(223,145,76,0.1)] sm:p-7"
                 >
+                  <Image
+                    src={pkg.image}
+                    alt=""
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    className="object-cover"
+                  />
+                  <PackageFireworkReveal active={hoverIndex === i} seed={i + 1} />
                   <PackageOrnament />
-                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(140deg,rgba(255,255,255,0.09),transparent_42%,transparent_68%,rgba(223,145,76,0.09))] opacity-80" />
-                  <div className="relative flex min-h-[280px] flex-col sm:min-h-[320px]">
+                  <div className="pointer-events-none absolute inset-0 z-[2] bg-[linear-gradient(140deg,rgba(255,255,255,0.09),transparent_42%,transparent_68%,rgba(223,145,76,0.09))] opacity-80" />
+                  <div className="relative z-[3] flex min-h-[280px] flex-col sm:min-h-[320px]">
                     <h3 className="max-w-[16ch] font-head text-[clamp(1.7rem,2.6vw,2.4rem)] font-semibold leading-[1.06] tracking-[-0.04em]">{pkg.title}</h3>
                     <p className="mt-4 max-w-[30ch] text-[13px] leading-relaxed text-white/55 sm:text-[14px]">{pkg.subtitle}</p>
                     <div className="mt-auto flex items-center gap-3 pt-10 text-[10px] font-medium uppercase tracking-[0.2em] text-[#df914c]/85">

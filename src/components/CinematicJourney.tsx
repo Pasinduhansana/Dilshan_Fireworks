@@ -155,7 +155,7 @@ export default function CinematicJourney({ landing, events, packages }: Cinemati
         const startTop = rect.top + rect.height * (isLg ? 0.1 : isSm ? 0.12 : 0.14);
         const dockScale = isLg ? 0.34 : isSm ? 0.4 : 0.46;
         const dockLeft = startLeft;
-        const dockTop = -height * dockScale - 80;
+        const dockTop = -height * dockScale - 240;
         Object.assign(rocketFlight.style, {
           position: "fixed",
           left: `${startLeft}px`,
@@ -175,7 +175,6 @@ export default function CinematicJourney({ landing, events, packages }: Cinemati
 
         if (!reduced) {
           const travel = { p: 0 };
-          const state = { p: 0 };
           let dockX = initial.dockLeft - initial.startLeft;
           let dockY = initial.dockTop - initial.startTop;
           let dockScale = initial.dockScale;
@@ -193,17 +192,9 @@ export default function CinematicJourney({ landing, events, packages }: Cinemati
             const y = gsap.utils.interpolate(0, dockY, p);
             const scale = gsap.utils.interpolate(1, dockScale, p);
             const rotation = gsap.utils.interpolate(0, 10, p);
-            const opacity = p < 0.72 ? 1 : gsap.utils.interpolate(1, 0, (p - 0.72) / 0.28);
+            const opacity = p < 0.5 ? 1 : gsap.utils.interpolate(1, 0, gsap.utils.clamp(0, 1, (p - 0.5) / 0.4));
             gsap.set(rocketFlight, { x, y, scale, rotation, opacity, overwrite: "auto" });
           };
-
-          const tick = () => {
-            if (!flightActive) return;
-            state.p += (travel.p - state.p) * 0.12;
-            if (Math.abs(travel.p - state.p) < 0.0005) state.p = travel.p;
-            applyRocket(state.p);
-          };
-          gsap.ticker.add(tick);
 
           const intro = gsap.fromTo(
             rocketFlight,
@@ -213,8 +204,7 @@ export default function CinematicJourney({ landing, events, packages }: Cinemati
               duration: 2.2, ease: "power3.out", delay: 0.2, overwrite: "auto",
               onComplete: () => {
                 gsap.set(rocketFlight, { x: 0, y: 0, scale: 1, rotation: 0 });
-                state.p = travel.p;
-                applyRocket(state.p);
+                applyRocket(travel.p);
                 flightActive = true;
               },
             },
@@ -223,15 +213,20 @@ export default function CinematicJourney({ landing, events, packages }: Cinemati
           const flight = gsap.to(travel, {
             p: 1,
             ease: "none",
-            paused: true,
             scrollTrigger: {
               trigger: journey,
               start: "top top",
               endTrigger: eventShell,
-              end: "bottom bottom",
-              scrub: true,
+              end: "top 50%",
+              scrub: 1.1,
               invalidateOnRefresh: true,
-              onRefresh: () => {
+              onUpdate: () => {
+                if (flightActive) applyRocket(travel.p);
+              },
+              onLeaveBack: () => {
+                if (flightActive) applyRocket(0);
+              },
+            onRefresh: () => {
                 if (!innerSection) return;
                 const rect = innerSection.getBoundingClientRect();
                 const vw = window.innerWidth;
@@ -243,7 +238,7 @@ export default function CinematicJourney({ landing, events, packages }: Cinemati
                 const startTop = rect.top + rect.height * (isLg ? 0.1 : isSm ? 0.12 : 0.14);
                 dockScale = isLg ? 0.34 : isSm ? 0.4 : 0.46;
                 const dockLeft = startLeft;
-                const dockTop = -height * dockScale - 80;
+                const dockTop = -height * dockScale - 240;
                 dockX = dockLeft - startLeft;
                 dockY = dockTop - startTop;
                 rocketFlight.style.left = `${startLeft}px`;
@@ -260,7 +255,6 @@ export default function CinematicJourney({ landing, events, packages }: Cinemati
             flight.kill();
             floatSpin?.kill();
             floatBob?.kill();
-            gsap.ticker.remove(tick);
             if (rocketFloat) gsap.set(rocketFloat, { clearProps: "transform" });
             gsap.set(rocketFlight, { clearProps: "transform,opacity,zIndex" });
             rocketFlight.style.cssText = "";
