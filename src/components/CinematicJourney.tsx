@@ -9,9 +9,10 @@ gsap.registerPlugin(ScrollTrigger);
 type CinematicJourneyProps = {
   landing: ReactNode;
   events: ReactNode;
+  packages?: ReactNode;
 };
 
-export default function CinematicJourney({ landing, events }: CinematicJourneyProps) {
+export default function CinematicJourney({ landing, events, packages }: CinematicJourneyProps) {
   const root = useRef<HTMLDivElement>(null);
   const scrollTween = useRef<gsap.core.Tween | null>(null);
 
@@ -21,6 +22,7 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
 
     const landingShell = journey.querySelector<HTMLElement>("[data-landing-shell]");
     const eventShell = journey.querySelector<HTMLElement>("[data-event-shell]");
+    const packagesShell = journey.querySelector<HTMLElement>("[data-packages-shell]");
     if (!landingShell || !eventShell) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -67,6 +69,7 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
     let activeLink: HTMLElement | null = null;
     let homeLink: HTMLElement | null = null;
     let eventsLink: HTMLElement | null = null;
+    let packagesLink: HTMLElement | null = null;
 
     const placeIndicator = (link: HTMLElement | null, animate: boolean) => {
       if (!indicator || !link) return;
@@ -113,6 +116,7 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
       });
       homeLink = navLinks[0];
       eventsLink = navLinks.find((link) => link.getAttribute("href") === "#events") ?? null;
+      packagesLink = navLinks.find((link) => link.getAttribute("href") === "#packages") ?? null;
       homeLink.style.background = "transparent";
       homeLink.style.boxShadow = "none";
       selectLink(homeLink, false);
@@ -121,7 +125,9 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
 
     let scrollActive = homeLink;
     const syncScrollActive = () => {
-      const next = eventShell.getBoundingClientRect().top <= window.innerHeight * 0.5 ? eventsLink : homeLink;
+      const half = window.innerHeight * 0.5;
+      const atPackages = !!packagesShell && packagesShell.getBoundingClientRect().top <= half;
+      const next = atPackages ? packagesLink : eventShell.getBoundingClientRect().top <= half ? eventsLink : homeLink;
       if (next && next !== scrollActive) {
         scrollActive = next;
         selectLink(next, true);
@@ -286,13 +292,19 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
         selectLink(clickedLink as HTMLElement, true);
       }
 
-      const anchor = target instanceof Element ? target.closest('a[href="#events"], a[href="#home"]') : null;
+      const anchor = target instanceof Element ? target.closest('a[href="#events"], a[href="#home"], a[href="#packages"]') : null;
       if (!anchor) return;
 
       event.preventDefault();
-      const isHome = anchor.getAttribute("href") === "#home";
-      const destination = isHome ? 0 : (transition?.scrollTrigger?.end ?? landingShell.offsetTop + landingShell.offsetHeight);
-      history.replaceState(null, "", isHome ? "#home" : "#events");
+      const href = anchor.getAttribute("href");
+      const isHome = href === "#home";
+      const isPackages = href === "#packages";
+      const destination = isHome
+        ? 0
+        : isPackages && packagesShell
+          ? window.scrollY + packagesShell.getBoundingClientRect().top
+          : (transition?.scrollTrigger?.end ?? landingShell.offsetTop + landingShell.offsetHeight);
+      history.replaceState(null, "", isHome ? "#home" : isPackages ? "#packages" : "#events");
 
       if (reduced) {
         window.scrollTo(0, destination);
@@ -392,6 +404,7 @@ export default function CinematicJourney({ landing, events }: CinematicJourneyPr
         {landing}
       </div>
       <div data-event-shell className="relative z-30">{events}</div>
+      {packages ? <div data-packages-shell className="relative z-30">{packages}</div> : null}
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-50 rounded-[9px] border-[7px] border-[#f7f8f4] sm:rounded-[12px] sm:border-[10px]"
